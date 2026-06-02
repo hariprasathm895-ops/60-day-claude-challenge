@@ -1,14 +1,24 @@
 # Day 2 – Prompt Engineering
 ## ABTalks 60 Days Claude Challenge
 
-## What I Learned
-Prompt Engineering is writing clear instructions to get better AI results.
+## What I Learned Today
+Prompt Engineering is the skill of writing clear, specific 
+instructions to get better results from AI tools like Claude.
 
-## Prompts Used
-- Lazy: "Create an image explaining Prompt Engineering"
-- Engineered: Full structured prompt with roles, format, examples
+## Lazy Prompt I Used
+"Create an image explaining Prompt Engineering"
+
+## Engineered Prompt I Used
+You are an AI educator teaching complete beginners.
+Explain Prompt Engineering in simple language.
+Include what it is, why it matters, weak vs strong examples,
+3 benefits, and a LinkedIn image concept.
 
 ## Key Learnings
-- Specific prompts save time
-- Better prompts = better outputs
-- Build reusable prompt templates
+- Vague prompts give vague results
+- Specific prompts save time and give better outputs  
+- Engineered prompts = reusable templates
+
+## Output Comparison
+- Lazy prompt → generic response
+- Engineered prompt → structured, detailed, usable output
