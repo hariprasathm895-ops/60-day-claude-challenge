@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Hariprasath M — Full Stack Developer & AI Engineer. ECE Student at Rathinam Technical Campus, Coimbatore. Building AI-powered solutions.">
+<meta name="keywords" content="Hariprasath, Full Stack Developer, AI Engineer, ECE Student, Python, Claude AI, Portfolio">
+<meta name="author" content="Hariprasath M">
+<meta property="og:title" content="Hariprasath M — Full Stack Developer & AI Engineer">
+<meta property="og:description" content="ECE Student building AI-powered solutions from Coimbatore, Tamil Nadu.">
+<title>Hariprasath M — Portfolio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={darkMode:'class',theme:{extend:{colors:{primary:'#7c6fff',secondary:'#00d4aa',accent:'#ff6b9d'},fontFamily:{sans:['Space Grotesk','sans-serif'],mono:['JetBrains Mono','monospace']}}}}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif}
+.gradient-text{background:linear-gradient(135deg,#7c6fff,#00d4aa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gradient-bg{background:linear-gradient(135deg,#7c6fff20,#00d4aa20)}
+.card-hover{transition:all 0.3s ease}
+.card-hover:hover{transform:translateY(-6px)}
+.skill-bar{transition:width 1.5s cubic-bezier(0.4,0,0.2,1)}
+.nav-link{position:relative}
+.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:linear-gradient(90deg,#7c6fff,#00d4aa);transition:width 0.3s}
+.nav-link.active::after,.nav-link:hover::after{width:100%}
+.typed-cursor{animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.fade-in{opacity:0;transform:translateY(30px);transition:all 0.6s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.glow{box-shadow:0 0 30px rgba(124,111,255,0.15)}
+.tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;margin:2px}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0f1117}
+::-webkit-scrollbar-thumb{background:linear-gradient(#7c6fff,#00d4aa);border-radius:3px}
+.dark .nav-bg{background:rgba(15,17,23,0.95);backdrop-filter:blur(20px)}
+.light .nav-bg,.nav-bg{background:rgba(255,255,255,0.95);backdrop-filter:blur(20px)}
+</style>
+</head>
+<body class="dark bg-gray-950 text-gray-100 transition-colors duration-300">
+
+<!-- NAV -->
+<nav class="nav-bg fixed top-0 w-full z-50 border-b border-gray-800/50">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#hero" class="font-mono text-lg font-500 gradient-text">hari.dev</a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#about" class="nav-link text-sm text-gray-400 hover:text-white transition-colors">About</a>
+      <a href="#skills" class="nav-link text-sm text-gray-400 hover:text-white transition-colors">Skills</a>
+      <a href="#projects" class="nav-link text-sm text-gray-400 hover:text-white transition-colors">Projects</a>
+      <a href="#achievements" class="nav-link text-sm text-gray-400 hover:text-white transition-colors">Achievements</a>
+      <a href="#contact" class="nav-link text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="toggleTheme()" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-lg" id="themeBtn">🌙</button>
+      <button onclick="toggleMenu()" class="md:hidden p-2 rounded-lg bg-gray-800">☰</button>
+    </div>
+  </div>
+  <div id="mobileMenu" class="hidden md:hidden px-6 pb-4">
+    <div class="flex flex-col gap-3">
+      <a href="#about" onclick="toggleMenu()" class="text-sm text-gray-400 hover:text-white py-2 border-b border-gray-800">About</a>
+      <a href="#skills" onclick="toggleMenu()" class="text-sm text-gray-400 hover:text-white py-2 border-b border-gray-800">Skills</a>
+      <a href="#projects" onclick="toggleMenu()" class="text-sm text-gray-400 hover:text-white py-2 border-b border-gray-800">Projects</a>
+      <a href="#achievements" onclick="toggleMenu()" class="text-sm text-gray-400 hover:text-white py-2 border-b border-gray-800">Achievements</a>
+      <a href="#contact" onclick="toggleMenu()" class="text-sm text-gray-400 hover:text-white py-2">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-20 right-10 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl"></div>
+  </div>
+  <div class="max-w-6xl mx-auto px-6 py-20 text-center relative z-10">
+    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-500 mb-8 fade-in">
+      <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+      Available for Internships & Opportunities
+    </div>
+    <div class="w-28 h-28 mx-auto mb-8 rounded-full bg-gradient-to-br from-purple-500 to-teal-500 flex items-center justify-center text-5xl font-700 text-white shadow-2xl fade-in">H</div>
+    <h1 class="text-5xl md:text-7xl font-700 mb-4 fade-in">
+      <span class="gradient-text">Hariprasath M</span>
+    </h1>
+    <div class="text-xl md:text-2xl text-gray-400 mb-8 h-8 fade-in">
+      <span id="typed"></span><span class="typed-cursor text-purple-400">|</span>
+    </div>
+    <p class="text-gray-500 mb-10 text-sm font-mono fade-in">📍 Coimbatore, Tamil Nadu, India</p>
+    <div class="flex flex-wrap justify-center gap-4 mb-12 fade-in">
+      <a href="https://linkedin.com/in/hari-prasath-642788384" target="_blank" class="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-500 transition-all hover:scale-105">
+        💼 LinkedIn
+      </a>
+      <a href="https://github.com/hariprasathm895-ops" target="_blank" class="flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-sm font-500 transition-all hover:scale-105">
+        🐙 GitHub
+      </a>
+      <a href="mailto:hariprasathm895@gmail.com" class="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-teal-600 text-white text-sm font-500 transition-all hover:scale-105">
+        ✉️ Hire Me
+      </a>
+    </div>
+    <div class="grid grid-cols-3 gap-6 max-w-sm mx-auto fade-in">
+      <div class="text-center"><div class="text-2xl font-700 gradient-text">9+</div><div class="text-xs text-gray-500">Days of AI</div></div>
+      <div class="text-center"><div class="text-2xl font-700 gradient-text">9.13</div><div class="text-xs text-gray-500">CGPA</div></div>
+      <div class="text-center"><div class="text-2xl font-700 gradient-text">6+</div><div class="text-xs text-gray-500">Certifications</div></div>
+    </div>
+    <div class="mt-12 animate-bounce"><a href="#about" class="text-gray-600 text-2xl">↓</a></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="py-24">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-16 fade-in">
+      <span class="font-mono text-sm text-purple-400">// about me</span>
+      <h2 class="text-4xl font-700 mt-2">Who I Am</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="fade-in">
+        <div class="w-64 h-64 mx-auto rounded-2xl bg-gradient-to-br from-purple-500/20 to-teal-500/20 border border-purple-500/20 flex items-center justify-center text-9xl glow">👨‍💻</div>
+      </div>
+      <div class="fade-in space-y-6">
+        <p class="text-gray-300 text-lg leading-relaxed">I'm a <span class="text-purple-400 font-500">first-year ECE student</span> at Rathinam Technical Campus, Coimbatore, passionate about Full Stack Development and AI Engineering. I build AI-powered solutions and document everything publicly.</p>
+        <p class="text-gray-400 leading-relaxed">Currently completing the <span class="text-teal-400 font-500">ABTalks 60-Day Claude AI Mastery Challenge</span>, building real-world projects daily using Claude AI, GitHub, and modern web technologies.</p>
+        <p class="text-gray-400 leading-relaxed">My goal is to bridge <span class="text-pink-400 font-500">ECE fundamentals with AI/ML</span> to create impactful software solutions and secure a placement as an AI Engineer or Full Stack Developer.</p>
+        <div class="grid grid-cols-2 gap-4 pt-4">
+          <div class="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div class="text-purple-400 text-sm font-mono mb-1">Degree</div>
+            <div class="text-sm text-gray-300">B.E. ECE · 2025–2029</div>
+          </div>
+          <div class="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div class="text-teal-400 text-sm font-mono mb-1">CGPA</div>
+            <div class="text-sm text-gray-300">9.13 / 10</div>
+          </div>
+          <div class="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div class="text-pink-400 text-sm font-mono mb-1">Status</div>
+            <div class="text-sm text-gray-300">Open to Internships</div>
+          </div>
+          <div class="bg-gray-900 rounded-xl p-4 border border-gray-800">
+            <div class="text-yellow-400 text-sm font-mono mb-1">Location</div>
+            <div class="text-sm text-gray-300">Coimbatore, TN 🇮🇳</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="py-24 bg-gray-900/50">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-16 fade-in">
+      <span class="font-mono text-sm text-teal-400">// skills & tools</span>
+      <h2 class="text-4xl font-700 mt-2">What I Work With</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-12 mb-16">
+      <div class="fade-in space-y-6">
+        <h3 class="text-lg font-600 text-gray-300 mb-6">Technical Proficiency</h3>
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-sm text-gray-400">Python</span><span class="text-sm text-purple-400">80%</span></div>
+          <div class="h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-purple-500 to-teal-500 rounded-full skill-bar" style="width:0" data-width="80%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-sm text-gray-400">HTML / CSS / JavaScript</span><span class="text-sm text-teal-400">75%</span></div>
+          <div class="h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-teal-500 to-blue-500 rounded-full skill-bar" style="width:0" data-width="75%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-sm text-gray-400">React.js / Node.js</span><span class="text-sm text-blue-400">60%</span></div>
+          <div class="h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full skill-bar" style="width:0" data-width="60%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-sm text-gray-400">DSA / Problem Solving</span><span class="text-sm text-pink-400">65%</span></div>
+          <div class="h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-pink-500 to-red-500 rounded-full skill-bar" style="width:0" data-width="65%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-sm text-gray-400">Claude AI / Prompt Engineering</span><span class="text-sm text-yellow-400">85%</span></div>
+          <div class="h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full skill-bar" style="width:0" data-width="85%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-sm text-gray-400">AWS / Cloud Computing</span><span class="text-sm text-orange-400">55%</span></div>
+          <div class="h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full skill-bar" style="width:0" data-width="55%"></div></div>
+        </div>
+      </div>
+      <div class="fade-in">
+        <h3 class="text-lg font-600 text-gray-300 mb-6">Tech Stack & Tools</h3>
+        <div class="flex flex-wrap gap-2 mb-8">
+          <span class="tag bg-purple-500/15 text-purple-400 border border-purple-500/20">Python</span>
+          <span class="tag bg-teal-500/15 text-teal-400 border border-teal-500/20">JavaScript</span>
+          <span class="tag bg-blue-500/15 text-blue-400 border border-blue-500/20">React.js</span>
+          <span class="tag bg-green-500/15 text-green-400 border border-green-500/20">Node.js</span>
+          <span class="tag bg-yellow-500/15 text-yellow-400 border border-yellow-500/20">Django</span>
+          <span class="tag bg-pink-500/15 text-pink-400 border border-pink-500/20">HTML5</span>
+          <span class="tag bg-orange-500/15 text-orange-400 border border-orange-500/20">CSS3</span>
+          <span class="tag bg-red-500/15 text-red-400 border border-red-500/20">AWS</span>
+          <span class="tag bg-cyan-500/15 text-cyan-400 border border-cyan-500/20">Git / GitHub</span>
+          <span class="tag bg-violet-500/15 text-violet-400 border border-violet-500/20">Claude AI</span>
+          <span class="tag bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">VS Code</span>
+          <span class="tag bg-sky-500/15 text-sky-400 border border-sky-500/20">Tailwind CSS</span>
+          <span class="tag bg-fuchsia-500/15 text-fuchsia-400 border border-fuchsia-500/20">Chart.js</span>
+          <span class="tag bg-lime-500/15 text-lime-400 border border-lime-500/20">DSA</span>
+          <span class="tag bg-amber-500/15 text-amber-400 border border-amber-500/20">OOP</span>
+          <span class="tag bg-indigo-500/15 text-indigo-400 border border-indigo-500/20">IoT</span>
+        </div>
+        <h3 class="text-lg font-600 text-gray-300 mb-4">Soft Skills</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center text-sm text-gray-400">🧠 Problem Solving</div>
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center text-sm text-gray-400">💬 Communication</div>
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center text-sm text-gray-400">🤝 Teamwork</div>
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center text-sm text-gray-400">🎯 Goal-Oriented</div>
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center text-sm text-gray-400">📈 Build in Public</div>
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center text-sm text-gray-400">⚡ Fast Learner</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="py-24">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-16 fade-in">
+      <span class="font-mono text-sm text-pink-400">// projects</span>
+      <h2 class="text-4xl font-700 mt-2">What I've Built</h2>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 card-hover fade-in glow">
+        <div class="text-3xl mb-4">🌍</div>
+        <h3 class="text-lg font-600 mb-2">Environmental Health Analyzer</h3>
+        <p class="text-gray-400 text-sm mb-4 leading-relaxed">Interactive dashboard analyzing AQI and water quality for 10 Indian cities with health impact analysis, personal report cards, and recommendations.</p>
+        <div class="flex flex-wrap gap-1 mb-4">
+          <span class="tag bg-blue-500/10 text-blue-400 text-xs">HTML</span>
+          <span class="tag bg-yellow-500/10 text-yellow-400 text-xs">Chart.js</span>
+          <span class="tag bg-purple-500/10 text-purple-400 text-xs">Claude AI</span>
+          <span class="tag bg-green-500/10 text-green-400 text-xs">JavaScript</span>
+        </div>
+        <a href="https://github.com/hariprasathm895-ops/60-day-claude-challenge" target="_blank" class="text-purple-400 text-sm hover:text-purple-300 transition-colors">View Project →</a>
+      </div>
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-3xl mb-4">🥗</div>
+        <h3 class="text-lg font-600 mb-2">NutriScope — Nutrition Tracker</h3>
+        <p class="text-gray-400 text-sm mb-4 leading-relaxed">Full-featured nutrition tracking app with 60+ foods database, 12 nutrients, meal planner, risk analysis, CSV upload, and dark theme UI.</p>
+        <div class="flex flex-wrap gap-1 mb-4">
+          <span class="tag bg-green-500/10 text-green-400 text-xs">HTML</span>
+          <span class="tag bg-teal-500/10 text-teal-400 text-xs">Chart.js</span>
+          <span class="tag bg-pink-500/10 text-pink-400 text-xs">Claude AI</span>
+          <span class="tag bg-blue-500/10 text-blue-400 text-xs">JavaScript</span>
+        </div>
+        <a href="https://github.com/hariprasathm895-ops/60-day-claude-challenge" target="_blank" class="text-teal-400 text-sm hover:text-teal-300 transition-colors">View Project →</a>
+      </div>
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-3xl mb-4">🤖</div>
+        <h3 class="text-lg font-600 mb-2">60-Day Claude AI Challenge</h3>
+        <p class="text-gray-400 text-sm mb-4 leading-relaxed">Daily AI projects using Claude — prompt engineering, context engineering, chain-of-thought, role-based prompting, and real-world app building.</p>
+        <div class="flex flex-wrap gap-1 mb-4">
+          <span class="tag bg-purple-500/10 text-purple-400 text-xs">Claude AI</span>
+          <span class="tag bg-orange-500/10 text-orange-400 text-xs">GitHub</span>
+          <span class="tag bg-blue-500/10 text-blue-400 text-xs">Prompt Eng</span>
+        </div>
+        <a href="https://github.com/hariprasathm895-ops/60-day-claude-challenge" target="_blank" class="text-pink-400 text-sm hover:text-pink-300 transition-colors">View Project →</a>
+      </div>
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-3xl mb-4">📊</div>
+        <h3 class="text-lg font-600 mb-2">AvenoraHub — SIH1363</h3>
+        <p class="text-gray-400 text-sm mb-4 leading-relaxed">Unified student engagement platform for Smart India Hackathon. Serving as Backend Engineer in a 4-member team targeting July 2026 demo.</p>
+        <div class="flex flex-wrap gap-1 mb-4">
+          <span class="tag bg-red-500/10 text-red-400 text-xs">Python</span>
+          <span class="tag bg-teal-500/10 text-teal-400 text-xs">Backend</span>
+          <span class="tag bg-yellow-500/10 text-yellow-400 text-xs">SIH</span>
+        </div>
+        <a href="https://github.com/hariprasathm895-ops" target="_blank" class="text-yellow-400 text-sm hover:text-yellow-300 transition-colors">View Project →</a>
+      </div>
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-3xl mb-4">📄</div>
+        <h3 class="text-lg font-600 mb-2">ATS Resume Optimizer</h3>
+        <p class="text-gray-400 text-sm mb-4 leading-relaxed">Used Claude AI to optimize my resume from 58 to 84 ATS score. Generated professional PDF with improved keywords and structure.</p>
+        <div class="flex flex-wrap gap-1 mb-4">
+          <span class="tag bg-purple-500/10 text-purple-400 text-xs">Claude AI</span>
+          <span class="tag bg-green-500/10 text-green-400 text-xs">Python</span>
+          <span class="tag bg-blue-500/10 text-blue-400 text-xs">ReportLab</span>
+        </div>
+        <a href="https://github.com/hariprasathm895-ops/60-day-claude-challenge" target="_blank" class="text-green-400 text-sm hover:text-green-300 transition-colors">View Project →</a>
+      </div>
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-3xl mb-4">🐍</div>
+        <h3 class="text-lg font-600 mb-2">Python DSA Practice Repo</h3>
+        <p class="text-gray-400 text-sm mb-4 leading-relaxed">Structured DSA practice repository with arrays, sorting, searching, and OOP implementations for IT placement preparation.</p>
+        <div class="flex flex-wrap gap-1 mb-4">
+          <span class="tag bg-yellow-500/10 text-yellow-400 text-xs">Python</span>
+          <span class="tag bg-blue-500/10 text-blue-400 text-xs">DSA</span>
+          <span class="tag bg-green-500/10 text-green-400 text-xs">GitHub</span>
+        </div>
+        <a href="https://github.com/hariprasathm895-ops" target="_blank" class="text-orange-400 text-sm hover:text-orange-300 transition-colors">View Project →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section id="achievements" class="py-24 bg-gray-900/50">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-16 fade-in">
+      <span class="font-mono text-sm text-yellow-400">// achievements</span>
+      <h2 class="text-4xl font-700 mt-2">Certifications & Wins</h2>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-gray-900 border border-purple-500/20 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-2xl mb-3">🏆</div>
+        <div class="text-xs font-mono text-purple-400 mb-2">NPTEL · IIT Madras</div>
+        <h3 class="font-600 mb-2">Joy of Computing using Python (Elite)</h3>
+        <p class="text-gray-500 text-sm">Score: 72% · Assignments: 25/25 · Jan–Apr 2026</p>
+      </div>
+      <div class="bg-gray-900 border border-blue-500/20 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-2xl mb-3">☁️</div>
+        <div class="text-xs font-mono text-blue-400 mb-2">LinkedIn Learning · AWS</div>
+        <h3 class="font-600 mb-2">AWS Cloud Practitioner (CLF-C02) Prep</h3>
+        <p class="text-gray-500 text-sm">Amazon Web Services · Cloud Computing · May 2026</p>
+      </div>
+      <div class="bg-gray-900 border border-green-500/20 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-2xl mb-3">🤖</div>
+        <div class="text-xs font-mono text-green-400 mb-2">HCL Technologies · NCVET</div>
+        <h3 class="font-600 mb-2">SOAR — AI to be Aware</h3>
+        <p class="text-gray-500 text-sm">NSQF Level 2 · Skill India Recognised · Sep 2025</p>
+      </div>
+      <div class="bg-gray-900 border border-yellow-500/20 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-2xl mb-3">💡</div>
+        <div class="text-xs font-mono text-yellow-400 mb-2">IIT Bombay · Coursera</div>
+        <h3 class="font-600 mb-2">Design Thinking and Innovation</h3>
+        <p class="text-gray-500 text-sm">Non-credit online course · Dec 2025</p>
+      </div>
+      <div class="bg-gray-900 border border-orange-500/20 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-2xl mb-3">🚀</div>
+        <div class="text-xs font-mono text-orange-400 mb-2">Wadhwani Foundation</div>
+        <h3 class="font-600 mb-2">Ignite Bootcamp — Idea to Plan</h3>
+        <p class="text-gray-500 text-sm">18 hrs · Ideation, Prototyping, Business Modelling · May 2026</p>
+      </div>
+      <div class="bg-gray-900 border border-red-500/20 rounded-2xl p-6 card-hover fade-in">
+        <div class="text-2xl mb-3">📐</div>
+        <div class="text-xs font-mono text-red-400 mb-2">ISTE Tamilnadu</div>
+        <h3 class="font-600 mb-2">Srinivasa Ramanujan Math Competition</h3>
+        <p class="text-gray-500 text-sm">National Level 3 · Feb 2026</p>
+      </div>
+    </div>
+    <div class="mt-12 text-center fade-in">
+      <div class="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-500/10 to-teal-500/10 border border-purple-500/20">
+        <span class="text-2xl">🔥</span>
+        <div class="text-left">
+          <div class="font-600">ABTalks 60-Day Claude AI Mastery Challenge</div>
+          <div class="text-sm text-gray-400">Day 10 of 60 · Building in public daily · 500+ LinkedIn connections</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="py-24">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <div class="fade-in mb-16">
+      <span class="font-mono text-sm text-teal-400">// contact</span>
+      <h2 class="text-4xl font-700 mt-2 mb-4">Let's Connect</h2>
+      <p class="text-gray-400">Open to internships, collaborations, and opportunities. Let's build something great together!</p>
+    </div>
+    <div class="grid sm:grid-cols-3 gap-6 mb-12 fade-in">
+      <a href="mailto:hariprasathm895@gmail.com" class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-purple-500/50 transition-all card-hover">
+        <div class="text-3xl mb-3">✉️</div>
+        <div class="text-sm font-600 mb-1">Email</div>
+        <div class="text-xs text-gray-500 break-all">hariprasathm895@gmail.com</div>
+      </a>
+      <a href="https://linkedin.com/in/hari-prasath-642788384" target="_blank" class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-500/50 transition-all card-hover">
+        <div class="text-3xl mb-3">💼</div>
+        <div class="text-sm font-600 mb-1">LinkedIn</div>
+        <div class="text-xs text-gray-500">hari-prasath-642788384</div>
+      </a>
+      <a href="https://github.com/hariprasathm895-ops" target="_blank" class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-teal-500/50 transition-all card-hover">
+        <div class="text-3xl mb-3">🐙</div>
+        <div class="text-sm font-600 mb-1">GitHub</div>
+        <div class="text-xs text-gray-500">hariprasathm895-ops</div>
+      </a>
+    </div>
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-8 fade-in text-left">
+      <h3 class="text-lg font-600 mb-6">Send a Message</h3>
+      <div class="space-y-4">
+        <input type="text" placeholder="Your Name" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-purple-500 transition-colors">
+        <input type="email" placeholder="Your Email" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-purple-500 transition-colors">
+        <textarea rows="4" placeholder="Your Message" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-purple-500 transition-colors resize-none"></textarea>
+        <button onclick="sendMessage()" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-teal-600 text-white font-500 hover:opacity-90 transition-all hover:scale-105">Send Message ✉️</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="py-8 border-t border-gray-800 text-center">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="gradient-text font-700 text-lg mb-2">Hariprasath M</div>
+    <p class="text-gray-600 text-sm mb-4">Built with Claude AI · Tailwind CSS · Vanilla JS · ABTalks 60-Day Challenge</p>
+    <div class="flex justify-center gap-6 text-gray-600 text-sm">
+      <a href="#hero" class="hover:text-gray-400 transition-colors">Top ↑</a>
+      <a href="https://github.com/hariprasathm895-ops" target="_blank" class="hover:text-gray-400 transition-colors">GitHub</a>
+      <a href="https://linkedin.com/in/hari-prasath-642788384" target="_blank" class="hover:text-gray-400 transition-colors">LinkedIn</a>
+    </div>
+    <p class="text-gray-700 text-xs mt-4">© 2026 Hariprasath M · Coimbatore, Tamil Nadu 🇮🇳</p>
+  </div>
+</footer>
+
+<script>
+const typed_strings=["Full Stack Developer 💻","AI Engineer 🤖","ECE Student 📡","Prompt Engineer ⚡","Building in Public 🚀"];
+let si=0,ci=0,deleting=false;
+function typeEffect(){
+  const el=document.getElementById('typed');
+  const str=typed_strings[si];
+  if(!deleting){el.textContent=str.substring(0,ci+1);ci++;}
+  else{el.textContent=str.substring(0,ci-1);ci--;}
+  if(!deleting&&ci===str.length){setTimeout(()=>deleting=true,2000);}
+  else if(deleting&&ci===0){deleting=false;si=(si+1)%typed_strings.length;}
+  setTimeout(typeEffect,deleting?60:100);
+}
+typeEffect();
+
+let dark=true;
+function toggleTheme(){
+  dark=!dark;
+  document.body.classList.toggle('dark',dark);
+  document.body.classList.toggle('bg-gray-950',dark);
+  document.body.classList.toggle('text-gray-100',dark);
+  document.body.classList.toggle('bg-gray-50',!dark);
+  document.body.classList.toggle('text-gray-900',!dark);
+  document.getElementById('themeBtn').textContent=dark?'🌙':'☀️';
+}
+
+function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('hidden');}
+
+function sendMessage(){alert('Thanks for reaching out! I\'ll get back to you soon. 📧');}
+
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');}});
+},{threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+const skillObserver=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.skill-bar').forEach(bar=>{
+        setTimeout(()=>{bar.style.width=bar.dataset.width;},200);
+      });
+    }
+  });
+},{threshold:0.3});
+const skillsSection=document.getElementById('skills');
+if(skillsSection)skillObserver.observe(skillsSection);
+
+const navLinks=document.querySelectorAll('.nav-link');
+window.addEventListener('scroll',()=>{
+  const sections=document.querySelectorAll('section[id]');
+  let current='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)current=s.id;});
+  navLinks.forEach(l=>{l.classList.toggle('active',l.getAttribute('href')==='#'+current);});
+});
+</script>
+</body>
+</html>
