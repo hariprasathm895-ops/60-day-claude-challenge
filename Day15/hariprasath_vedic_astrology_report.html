@@ -1,0 +1,349 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.report { max-width: 680px; padding: 1rem 0; }
+.hero { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; border: 0.5px solid var(--color-border-tertiary); }
+.hero-name { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.hero-sub { font-size: 14px; color: var(--color-text-secondary); margin-top: 4px; }
+.note-box { background: var(--color-background-warning); border: 0.5px solid var(--color-border-warning); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; margin-bottom: 1.5rem; font-size: 13px; color: var(--color-text-warning); }
+.section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+.section-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.section-title i { font-size: 18px; color: var(--color-text-secondary); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+.card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem; }
+.card-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.card-value { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.card-sub { font-size: 12px; color: var(--color-text-secondary); }
+.tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; margin: 2px; }
+.tag-purple { background: #EEEDFE; color: #3C3489; }
+.tag-teal { background: #E1F5EE; color: #0F6E56; }
+.tag-amber { background: #FAEEDA; color: #854F0B; }
+.tag-red { background: #FCEBEB; color: #A32D2D; }
+.tag-blue { background: #E6F1FB; color: #185FA5; }
+.tag-coral { background: #FAECE7; color: #993C1D; }
+.row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 6px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-text-secondary); margin-top: 6px; flex-shrink: 0; }
+.dot-green { background: #1D9E75; }
+.dot-amber { background: #BA7517; }
+.dot-red { background: #E24B4A; }
+.txt { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.txt-primary { color: var(--color-text-primary); font-size: 13px; line-height: 1.6; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 10px; font-weight: 500; font-size: 12px; color: var(--color-text-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+td { padding: 8px 10px; color: var(--color-text-primary); border-bottom: 0.5px solid var(--color-border-tertiary); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+.best-year { background: #E1F5EE; }
+.tough-year { background: #FCEBEB; }
+.planet-row td:first-child { font-weight: 500; }
+.dasha-box { border-left: 3px solid #7F77DD; padding-left: 1rem; margin-bottom: 1rem; }
+.remedy-box { border-left: 3px solid #1D9E75; padding-left: 1rem; margin-bottom: 0.75rem; }
+.divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1rem 0; }
+.pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.5rem; }
+.age-badge { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--color-text-secondary); }
+.highlight { color: #185FA5; font-weight: 500; }
+.warning { color: #BA7517; font-weight: 500; }
+</style>
+
+<div class="report">
+
+  <div class="hero">
+    <div class="hero-name">Hariprasath M</div>
+    <div class="hero-sub">Male &nbsp;·&nbsp; Born 5 April 2006 &nbsp;·&nbsp; Karapattu, Thiruvannamalai &nbsp;·&nbsp; Current: Coimbatore &nbsp;·&nbsp; Unmarried &nbsp;·&nbsp; Student, 1st Year ECE</div>
+  </div>
+
+  <div class="note-box">
+    <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+    <strong>Birth time unknown.</strong> Lagna (Ascendant) and house-specific predictions cannot be determined. This report uses Moon-chart (Chandra Lagna) and Solar chart as primary reference. Planetary positions, Nakshatra, and Dasha are calculated from date alone. For a precise reading, provide birth time (even approximate ±1–2 hrs helps).
+  </div>
+
+  <!-- SECTION 1: Birth Chart -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-planet" aria-hidden="true"></i> 1. Birth chart summary</div>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="card-label">Sun sign (Vedic)</div>
+        <div class="card-value">Meena (Pisces)</div>
+        <div class="card-sub">Sun at ~21° Meena</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Moon sign</div>
+        <div class="card-value">Kanya (Virgo)</div>
+        <div class="card-sub">Approximate — time unknown</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Nakshatra</div>
+        <div class="card-value">Hasta / Chitra</div>
+        <div class="card-sub">Moon near Kanya cusp</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-label">Lagna (Ascendant)</div>
+        <div class="card-value">Unknown (birth time needed)</div>
+        <div class="card-sub">Chandra Lagna used: Kanya</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Atmakaraka</div>
+        <div class="card-value">Sun (Surya)</div>
+        <div class="card-sub">Soul indicator — leadership, purpose</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:1rem; font-size:14px;">Planetary positions (5 Apr 2006)</div>
+    <table>
+      <tr><th>Planet</th><th>Sign (Vedic)</th><th>Nakshatra</th><th>Condition</th></tr>
+      <tr class="planet-row"><td>Sun ☉</td><td>Meena (Pisces)</td><td>Revati</td><td><span class="tag tag-teal">Neutral</span></td></tr>
+      <tr class="planet-row"><td>Moon ☽</td><td>Kanya (Virgo)</td><td>Hasta / Chitra</td><td><span class="tag tag-teal">Debilitation area — needs check</span></td></tr>
+      <tr class="planet-row"><td>Mars ♂</td><td>Mithuna (Gemini)</td><td>Ardra</td><td><span class="tag tag-amber">Avg strength</span></td></tr>
+      <tr class="planet-row"><td>Mercury ☿</td><td>Meena (Pisces)</td><td>Revati</td><td><span class="tag tag-red">Debilitated</span></td></tr>
+      <tr class="planet-row"><td>Jupiter ♃</td><td>Vrishabha (Taurus)</td><td>Rohini</td><td><span class="tag tag-blue">Retrograde — strong inward</span></td></tr>
+      <tr class="planet-row"><td>Venus ♀</td><td>Kumbha (Aquarius)</td><td>Shatabhisha</td><td><span class="tag tag-teal">Own-friendly house</span></td></tr>
+      <tr class="planet-row"><td>Saturn ♄</td><td>Karka (Cancer)</td><td>Punarvasu</td><td><span class="tag tag-red">Debilitated</span></td></tr>
+      <tr class="planet-row"><td>Rahu ☊</td><td>Meena (Pisces)</td><td>Revati</td><td><span class="tag tag-amber">Amplifies Pisces themes</span></td></tr>
+      <tr class="planet-row"><td>Ketu ☋</td><td>Kanya (Virgo)</td><td>Hasta</td><td><span class="tag tag-purple">Past-life pattern indicator</span></td></tr>
+    </table>
+
+    <hr class="divider">
+    <div class="section-title" style="font-size:14px; margin-bottom:0.5rem;">Key yogas and doshas</div>
+    <div class="row"><div class="dot dot-green"></div><div class="txt-primary"><strong>Budhaditya Yoga (partial):</strong> Sun and Mercury in same sign (Meena) — intelligence, communication ability, though weakened by Mercury debilitation.</div></div>
+    <div class="row"><div class="dot dot-green"></div><div class="txt-primary"><strong>Rahu-Sun conjunction in Meena:</strong> Amplifies ambition, drives unusual career paths, strong desire for recognition.</div></div>
+    <div class="row"><div class="dot dot-amber"></div><div class="txt-primary"><strong>Saturn debilitation (Neecha):</strong> Saturn in Cancer — delays in career structure, discipline struggles in early life, improves post-28.</div></div>
+    <div class="row"><div class="dot dot-amber"></div><div class="txt-primary"><strong>Ketu in Kanya:</strong> Karmic past with analysis, service, perfectionism — these come naturally but cause inner restlessness.</div></div>
+    <div class="row"><div class="dot dot-green"></div><div class="txt-primary"><strong>Jupiter retrograde in Taurus:</strong> Deep inner wisdom, unconventional beliefs, strong values around money and knowledge.</div></div>
+  </div>
+
+  <!-- SECTION 2: Life Pattern -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-brain" aria-hidden="true"></i> 2. Life pattern analysis</div>
+
+    <div class="grid2">
+      <div>
+        <div class="card-label" style="margin-bottom:6px; font-size:12px;">Core personality</div>
+        <div class="row"><div class="dot dot-green"></div><div class="txt">Analytical, detail-oriented (Kanya Moon + Ketu)</div></div>
+        <div class="row"><div class="dot dot-green"></div><div class="txt">Intuitive and visionary (Sun + Rahu in Meena)</div></div>
+        <div class="row"><div class="dot dot-green"></div><div class="txt">Problem-solver identity — drawn to tech and systems</div></div>
+        <div class="row"><div class="dot dot-amber"></div><div class="txt">Over-thinking before acting (Mercury debilitated)</div></div>
+        <div class="row"><div class="dot dot-amber"></div><div class="txt">Inconsistency in routine discipline (Saturn debilitated)</div></div>
+      </div>
+      <div>
+        <div class="card-label" style="margin-bottom:6px; font-size:12px;">Childhood and karmic patterns</div>
+        <div class="row"><div class="dot"></div><div class="txt">Village background gives grounded values; strong sense of duty to family</div></div>
+        <div class="row"><div class="dot"></div><div class="txt">Ketu in Kanya: past-life pattern of service and perfectionism — may feel pressure to be "perfect" early on</div></div>
+        <div class="row"><div class="dot"></div><div class="txt">Rahu in Meena: this life pushes toward creativity, spirituality, technology, foreign exposure</div></div>
+        <div class="row"><div class="dot dot-amber"></div><div class="txt">Recurring pattern: self-doubt after minor failures — must be consciously overcome</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Career & Wealth -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-briefcase" aria-hidden="true"></i> 3. Career & wealth (highest priority)</div>
+
+    <div class="grid2" style="margin-bottom:1rem;">
+      <div class="card" style="border-left: 3px solid #185FA5;">
+        <div class="card-label">Career suitability</div>
+        <div class="card-value">Technology — strong fit</div>
+        <div class="card-sub">ECE + embedded systems, AI/ML, communication tech, product engineering</div>
+      </div>
+      <div class="card" style="border-left: 3px solid #1D9E75;">
+        <div class="card-label">Job vs business</div>
+        <div class="card-value">Job first (age 22–28), then entrepreneurship</div>
+        <div class="card-sub">Rahu pushes for independence, but Saturn debilitation needs structure first</div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="card-label">Leadership potential</div>
+        <div class="card-value">High</div>
+        <div class="card-sub">Sun as Atmakaraka — natural authority emerges post-25</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Govt job potential</div>
+        <div class="card-value">Moderate</div>
+        <div class="card-sub">Saturn debilitation limits structured govt roles; private sector suits better</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Foreign opportunity</div>
+        <div class="card-value">High probability</div>
+        <div class="card-sub">Rahu in Meena = strong foreign connection in career; abroad after 24</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-label" style="margin-bottom:8px;">Best-suited fields</div>
+    <div class="pill-row">
+      <span class="tag tag-blue">Embedded systems / VLSI</span>
+      <span class="tag tag-blue">AI / ML engineering</span>
+      <span class="tag tag-blue">Product management (tech)</span>
+      <span class="tag tag-blue">Telecommunications</span>
+      <span class="tag tag-purple">Entrepreneurship (edtech / fintech)</span>
+      <span class="tag tag-teal">Research / R&D</span>
+    </div>
+
+    <hr class="divider">
+    <div class="card-label" style="margin-bottom:8px;">Age-range forecast: career & wealth</div>
+    <table>
+      <tr><th>Age range</th><th>Phase</th><th>What to expect</th></tr>
+      <tr><td>18–21</td><td><span class="tag tag-amber">Foundation</span></td><td>Skill-building, internships, hackathons — no major income yet. Avoid shortcuts.</td></tr>
+      <tr><td>22–25</td><td><span class="tag tag-teal">First breakthrough</span></td><td>First job or significant placement. Good learning period. Salary moderate.</td></tr>
+      <tr><td>25–28</td><td><span class="tag tag-blue">Growth phase</span></td><td>Career acceleration. Possible job switch or specialization. Savings start.</td></tr>
+      <tr><td>28–32</td><td><span class="tag tag-purple">Wealth building</span></td><td>Saturn matures at 29 — discipline improves dramatically. Property/investment window opens.</td></tr>
+      <tr><td>32–38</td><td><span class="tag tag-teal">Peak earning</span></td><td>Best wealth accumulation phase. Business ventures possible. Leadership roles.</td></tr>
+    </table>
+
+    <hr class="divider">
+    <div class="row"><div class="dot dot-amber"></div><div class="txt"><strong>Wealth caution:</strong> Mercury debilitated — be careful with financial paperwork, contracts, investments in early 20s. Get expert advice before any big financial move.</div></div>
+    <div class="row"><div class="dot dot-green"></div><div class="txt"><strong>Jupiter in Taurus:</strong> Strong material instincts. Land/property investment after age 30 will be favorable.</div></div>
+  </div>
+
+  <!-- SECTION 4: Relationships -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-heart" aria-hidden="true"></i> 4. Relationships & marriage</div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-label">Marriage type</div>
+        <div class="card-value">Love with family acceptance</div>
+        <div class="card-sub">Venus in Aquarius suggests unconventional partner; family still matters</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Marriage timing windows</div>
+        <div class="card-value">Age 26–29 or 31–33</div>
+        <div class="card-sub">Post-Saturn maturation; avoid rushed decisions before 25</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-label" style="margin-bottom:8px;">Spouse characteristics (Venus in Aquarius)</div>
+    <div class="pill-row">
+      <span class="tag tag-purple">Independent and modern</span>
+      <span class="tag tag-blue">Educated / career-oriented</span>
+      <span class="tag tag-teal">Intellectual and unconventional</span>
+      <span class="tag tag-amber">May be from different background</span>
+    </div>
+
+    <hr class="divider">
+    <div class="row"><div class="dot dot-amber"></div><div class="txt"><strong>Relationship risk:</strong> Kanya Moon creates inner critical nature — may over-analyze partners. Moon-Ketu conjunction pattern suggests overthinking in relationships.</div></div>
+    <div class="row"><div class="dot dot-green"></div><div class="txt"><strong>Strength:</strong> Loyal, caring, dedicated once committed. Venus placement gives aesthetic taste and charm.</div></div>
+  </div>
+
+  <!-- SECTION 5: Current Dasha -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-calendar-time" aria-hidden="true"></i> 5. Current dasha analysis</div>
+
+    <div class="dasha-box">
+      <div style="font-weight:500; font-size:14px; color:var(--color-text-primary); margin-bottom:4px;">Mahadasha: Rahu (approx. 2004 – 2022)</div>
+      <div class="txt">Rahu Mahadasha shapes early life with ambition, unconventional ideas, fast growth and confusion. You are likely in the final years of this period — a time of transition and identity-seeking.</div>
+    </div>
+
+    <div class="dasha-box" style="border-color: #1D9E75;">
+      <div style="font-weight:500; font-size:14px; color:var(--color-text-primary); margin-bottom:4px;">Upcoming Mahadasha: Jupiter (2022 – 2038)</div>
+      <div class="txt">This is your most important phase for the next 16 years. Jupiter governs education, wisdom, expansion, foreign growth and career. As a student entering Jupiter Dasha around 2022–24, this is an exceptionally auspicious window for academic excellence, skill-building, and early career foundation.</div>
+    </div>
+
+    <div class="grid2">
+      <div class="card" style="border-left: 3px solid #1D9E75;">
+        <div class="card-label">Current opportunities</div>
+        <div class="txt" style="margin-top:4px;">• Strong period for learning and academics<br>• Networking and mentorship connections<br>• Hackathons, internships, open-source<br>• Spiritual and philosophical growth</div>
+      </div>
+      <div class="card" style="border-left: 3px solid #E24B4A;">
+        <div class="card-label">Current challenges</div>
+        <div class="txt" style="margin-top:4px;">• Jupiter retrograde: slow but deep progress — don't rush<br>• Mercury debilitation: communication may feel limited<br>• Avoid overconfidence or premature shortcuts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: 5-Year Forecast -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-chart-line" aria-hidden="true"></i> 6. Five-year forecast</div>
+
+    <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:8px; display:flex; gap:16px;">
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#E1F5EE;border-radius:2px;border:0.5px solid #1D9E75;"></span>Best year</span>
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#FCEBEB;border-radius:2px;border:0.5px solid #E24B4A;"></span>Toughest year</span>
+    </div>
+
+    <table>
+      <tr><th>Year (Age)</th><th>Career</th><th>Money</th><th>Relationships</th><th>Health</th></tr>
+      <tr>
+        <td>2025–26 (19)</td>
+        <td>Academic excellence; internship applications</td>
+        <td>Dependent; small stipends possible</td>
+        <td>Friendships deepen; no major romance yet</td>
+        <td>Good — maintain sleep & diet</td>
+      </tr>
+      <tr class="best-year">
+        <td><strong>2026–27 (20) ⭐</strong></td>
+        <td>Best academic year — strong projects, campus recognition</td>
+        <td>Internship income begins</td>
+        <td>Social expansion; possible first attraction</td>
+        <td>Very good</td>
+      </tr>
+      <tr>
+        <td>2027–28 (21)</td>
+        <td>Pre-placement prep; skill specialization</td>
+        <td>Focus on savings habits</td>
+        <td>Stable; balanced energy</td>
+        <td>Watch stress levels</td>
+      </tr>
+      <tr class="best-year">
+        <td><strong>2028–29 (22) ⭐</strong></td>
+        <td>First job / campus placement — major milestone</td>
+        <td>First salary; good period starts</td>
+        <td>Relationship possibilities open up</td>
+        <td>Good overall</td>
+      </tr>
+      <tr class="tough-year">
+        <td><strong>2029–30 (23) ⚠</strong></td>
+        <td>Adjustment period — new work environment challenges</td>
+        <td>Expenses rise; manage carefully</td>
+        <td>Some friction in close relationships</td>
+        <td>Monitor energy and digestion</td>
+      </tr>
+    </table>
+
+    <div class="pill-row" style="margin-top:0.75rem;">
+      <span class="age-badge">⭐ Best years: 2026–27 and 2028–29</span>
+      <span class="age-badge">⚠ Toughest: 2029–30</span>
+      <span class="age-badge">🔄 Major turning point: Age 22 (first career entry)</span>
+    </div>
+  </div>
+
+  <!-- SECTION 7: Remedies -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-sparkles" aria-hidden="true"></i> 7. Astrologically justified remedies</div>
+
+    <div class="remedy-box">
+      <div style="font-weight:500; font-size:13px; color:var(--color-text-primary);">For Mercury debilitation</div>
+      <div class="txt" style="margin-top:4px;">Recite <em>Budha Mantra</em>: "Om Budhaya Namah" — 108 times on Wednesdays. Helps with communication, logical clarity, academic performance.</div>
+    </div>
+
+    <div class="remedy-box">
+      <div style="font-weight:500; font-size:13px; color:var(--color-text-primary);">For Saturn debilitation</div>
+      <div class="txt" style="margin-top:4px;">Light sesame oil lamp on Saturdays. Recite Shani mantra: "Om Shanaischaraya Namah." Donate black sesame or black clothes to those in need. Builds discipline and removes delays.</div>
+    </div>
+
+    <div class="remedy-box" style="border-color: #7F77DD;">
+      <div style="font-weight:500; font-size:13px; color:var(--color-text-primary);">For Rahu in Meena (ambition channeling)</div>
+      <div class="txt" style="margin-top:4px;">Meditate or do pranayama daily — even 10 minutes. Rahu in Pisces benefits from grounding spiritual practice. Avoid overthinking and impulsive tech decisions.</div>
+    </div>
+
+    <div class="remedy-box" style="border-color: #BA7517;">
+      <div style="font-weight:500; font-size:13px; color:var(--color-text-primary);">Spiritual practice (Jupiter Dasha)</div>
+      <div class="txt" style="margin-top:4px;">Read sacred or philosophical texts regularly (even tech philosophy counts). Jupiter Mahadasha is fed by wisdom-seeking. Avoid moral shortcuts — Jupiter rewards ethical conduct directly.</div>
+    </div>
+
+    <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:0.75rem 1rem; margin-top:0.5rem;">
+      <div class="txt"><strong>Gemstone caution:</strong> Do not wear any gemstone without knowing your Lagna. Wearing the wrong gemstone (e.g. blue sapphire without checking Saturn placement relative to your Ascendant) can have adverse effects. Get a proper birth-time-based consultation first.</div>
+    </div>
+  </div>
+
+  <!-- Final note -->
+  <div style="padding:1rem; text-align:center; font-size:12px; color:var(--color-text-secondary);">
+    Report generated for Hariprasath M · Based on 5 Apr 2006, Thiruvannamalai · Birth time unknown — provide birth time for Lagna-based precision · For GitHub Day 15 submission
+  </div>
+</div>
