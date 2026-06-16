@@ -1,0 +1,388 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.header{padding:1.5rem 0 1rem;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.5rem}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:var(--border-radius-md);margin-left:8px}
+.badge-nse{background:#EAF3DE;color:#3B6D11}
+.badge-it{background:#E6F1FB;color:#185FA5}
+.badge-lc{background:#FAEEDA;color:#854F0B}
+.tabs{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.5rem;overflow-x:auto}
+.tab{padding:8px 16px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:var(--color-text-secondary);white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.panel{display:none}.panel.active{display:block}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem}
+.metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em}
+.metric-val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.metric-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.section-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.row{display:flex;gap:12px;margin-bottom:1rem;flex-wrap:wrap}
+.col{flex:1;min-width:200px}
+.verdict-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500}
+.chip-fair{background:#EAF3DE;color:#3B6D11}
+.chip-mod{background:#FAEEDA;color:#854F0B}
+.chip-str{background:#E1F5EE;color:#0F6E56}
+.chip-weak{background:#FCEBEB;color:#A32D2D}
+.peer-table{width:100%;font-size:13px;border-collapse:collapse}
+.peer-table th{text-align:left;padding:8px 10px;font-weight:500;color:var(--color-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:0.04em;border-bottom:0.5px solid var(--color-border-tertiary)}
+.peer-table td{padding:9px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.peer-table tr:last-child td{border-bottom:none}
+.peer-table tr.highlight td{font-weight:500;background:var(--color-background-secondary)}
+.strength{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.strength:last-child{border-bottom:none}
+.s-icon{width:28px;height:28px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.s-green{background:#E1F5EE;color:#0F6E56}
+.s-red{background:#FCEBEB;color:#A32D2D}
+.s-title{font-size:13px;font-weight:500;margin-bottom:2px}
+.s-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.ow-bar-wrap{margin-bottom:12px}
+.ow-label{display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.ow-bar{height:8px;border-radius:4px;background:var(--color-border-tertiary)}
+.ow-fill{height:8px;border-radius:4px}
+.disclaimer{font-size:11px;color:var(--color-text-secondary);line-height:1.6;border-top:0.5px solid var(--color-border-tertiary);padding-top:1rem;margin-top:1rem}
+.source-tag{font-size:10px;color:var(--color-text-secondary)}
+</style>
+
+<div class="header">
+  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+    <span style="font-size:22px;font-weight:500;color:var(--color-text-primary)">Tata Consultancy Services</span>
+    <span class="badge badge-nse">NSE: TCS</span>
+    <span class="badge badge-it">IT Services</span>
+    <span class="badge badge-lc">Large Cap</span>
+  </div>
+  <div style="font-size:13px;color:var(--color-text-secondary)">Fundamental Research Report · As of 16 June 2026 · <span style="color:var(--color-text-primary);font-weight:500">₹2,185.30</span> CMP</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('snapshot',this)">Snapshot</button>
+  <button class="tab" onclick="switchTab('valuation',this)">Valuation</button>
+  <button class="tab" onclick="switchTab('growth',this)">Growth</button>
+  <button class="tab" onclick="switchTab('health',this)">Health</button>
+  <button class="tab" onclick="switchTab('peers',this)">Peers</button>
+  <button class="tab" onclick="switchTab('ownership',this)">Ownership</button>
+  <button class="tab" onclick="switchTab('view',this)">View</button>
+</div>
+
+<div id="snapshot" class="panel active">
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">CMP</div><div class="metric-val">₹2,185</div><div class="metric-sub source-tag">Tickertape, 16 Jun 2026</div></div>
+    <div class="metric-card"><div class="metric-label">Market cap</div><div class="metric-val">₹7.86L Cr</div><div class="metric-sub source-tag">Screener</div></div>
+    <div class="metric-card"><div class="metric-label">P/E ratio</div><div class="metric-val">15.8x</div><div class="metric-sub source-tag">Angel One</div></div>
+    <div class="metric-card"><div class="metric-label">P/B ratio</div><div class="metric-val">7.29x</div><div class="metric-sub source-tag">Angel One</div></div>
+    <div class="metric-card"><div class="metric-label">ROE</div><div class="metric-val">45.6%</div><div class="metric-sub source-tag">Dhan</div></div>
+    <div class="metric-card"><div class="metric-label">ROCE</div><div class="metric-val">54.9%</div><div class="metric-sub source-tag">Dhan</div></div>
+    <div class="metric-card"><div class="metric-label">52W High</div><div class="metric-val">₹3,538</div><div class="metric-sub source-tag">Kotak Neo</div></div>
+    <div class="metric-card"><div class="metric-label">52W Low</div><div class="metric-val">₹2,110</div><div class="metric-sub source-tag">Kotak Neo</div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Company overview</div>
+    <p style="font-size:14px;color:var(--color-text-primary);line-height:1.7">Tata Consultancy Services (TCS) is India's largest IT services and consulting company and a flagship of the Tata Group. Founded in 1968 and headquartered in Mumbai, TCS operates across 55 countries with over 6,00,000 employees. It serves clients in banking, retail, manufacturing, telecom, and life sciences. CEO K. Krithivasan leads the company, which is dual-listed on NSE and BSE.</p>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Price performance (illustrative trend)</div>
+    <div style="position:relative;width:100%;height:220px">
+      <canvas id="priceChart" role="img" aria-label="TCS 12-month approximate price trend from ~₹3,500 to ₹2,185">TCS share price trend over 12 months declining from ~₹3,500 to ₹2,185.</canvas>
+    </div>
+    <div style="font-size:11px;color:var(--color-text-secondary);margin-top:8px">1-year return: −37% · Note: Trend line is illustrative based on reported data points. Source: Kotak Neo, Tickertape</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Key recent news</div>
+    <div class="strength">
+      <div class="s-icon s-green"><i class="ti ti-building" aria-hidden="true"></i></div>
+      <div><div class="s-title">Canada Life partnership</div><div class="s-desc">Multi-year transformation and managed services deal signed in June 2026, adding to long-term revenue pipeline. (Source: HDFC Sec)</div></div>
+    </div>
+    <div class="strength">
+      <div class="s-icon s-green"><i class="ti ti-cpu" aria-hidden="true"></i></div>
+      <div><div class="s-title">Oracle AI Data Platform Lab</div><div class="s-desc">India's first Oracle AI Data Platform Lab launched in collaboration with Oracle, June 2026. (Source: HDFC Sec)</div></div>
+    </div>
+    <div class="strength">
+      <div class="s-icon s-red"><i class="ti ti-gavel" aria-hidden="true"></i></div>
+      <div><div class="s-title">US Supreme Court ruling</div><div class="s-desc">US Supreme Court rejected TCS's appeal in $168M DXC trade-secrets case. Total exposure now ~$220M. TCS provisioning $70M in Q1 FY27 (exceptional charge). (Source: Groww)</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="valuation" class="panel">
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">P/E (current)</div><div class="metric-val">15.8x</div><div class="metric-sub source-tag">Angel One</div></div>
+    <div class="metric-card"><div class="metric-label">P/B</div><div class="metric-val">7.29x</div><div class="metric-sub source-tag">Angel One</div></div>
+    <div class="metric-card"><div class="metric-label">EV/EBITDA</div><div class="metric-val">17.6x</div><div class="metric-sub source-tag">MarketsMojo</div></div>
+    <div class="metric-card"><div class="metric-label">Div. yield</div><div class="metric-val">5.1%</div><div class="metric-sub source-tag">Tickertape</div></div>
+    <div class="metric-card"><div class="metric-label">Book value</div><div class="metric-val">₹296.6</div><div class="metric-sub source-tag">Dhan</div></div>
+    <div class="metric-card"><div class="metric-label">Face value</div><div class="metric-val">₹1.00</div><div class="metric-sub source-tag">Dhan</div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Valuation verdict</div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+      <span class="verdict-chip chip-fair"><i class="ti ti-chart-line" aria-hidden="true"></i> Approaching fair/attractive</span>
+    </div>
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">At a P/E of ~15.8x, TCS trades significantly below its 5-year historical average of ~25x. The stock's YTD decline of ~37% has compressed valuations considerably. MarketsMojo moved TCS to "attractive" grade in June 2025. The EV/EBITDA of ~17.6x vs. sector average warrants monitoring. Dividend yield of 5.1% is among the highest for a Nifty IT blue-chip, offering partial downside cushion. <strong style="font-weight:500">Verdict: Cheap vs. its own history; fair vs. near-term earnings pressure.</strong></p>
+  </div>
+
+  <div class="card">
+    <div class="section-title">P/E comparison (current vs. history)</div>
+    <div style="position:relative;width:100%;height:200px">
+      <canvas id="peChart" role="img" aria-label="Bar chart comparing TCS P/E across time periods">P/E: Current 15.8x, 5Y avg ~25x, Sector avg ~22x</canvas>
+    </div>
+  </div>
+</div>
+
+<div id="growth" class="panel">
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Revenue (TTM)</div><div class="metric-val">₹2.67L Cr</div><div class="metric-sub source-tag">Screener</div></div>
+    <div class="metric-card"><div class="metric-label">Net profit (TTM)</div><div class="metric-val">₹49,454 Cr</div><div class="metric-sub source-tag">Screener</div></div>
+    <div class="metric-card"><div class="metric-label">EPS (TTM)</div><div class="metric-val">₹134.2</div><div class="metric-sub source-tag">TipRanks</div></div>
+    <div class="metric-card"><div class="metric-label">Sales CAGR (5Y)</div><div class="metric-val">10.2%</div><div class="metric-sub source-tag">Screener</div></div>
+    <div class="metric-card"><div class="metric-label">Q4 FY26 profit</div><div class="metric-val">₹13,718 Cr</div><div class="metric-sub source-tag">HDFC Sec</div></div>
+    <div class="metric-card"><div class="metric-label">YoY profit growth</div><div class="metric-val">+12.2%</div><div class="metric-sub source-tag">HDFC Sec</div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Quarterly profit trend</div>
+    <div style="position:relative;width:100%;height:220px">
+      <canvas id="profitChart" role="img" aria-label="Bar chart of TCS quarterly net profit">TCS net profit: Q1 FY26 ~10,900, Q2 FY26 ~11,900, Q3 FY26 ~10,657, Q4 FY26 13,718 Cr</canvas>
+    </div>
+    <div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px">Q3 FY26 saw a dip (−13.9% YoY) due to exceptional charges. Q4 FY26 recovered strongly (+12.2% YoY). Source: HDFC Sec</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Growth assessment</div>
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">Revenue growth at 10.2% CAGR over 5 years is described by Screener as "poor" for an IT major, reflecting global IT spending headwinds, discretionary spending cuts by clients, and BFSI vertical softness. However, Q4 FY26 profit growth of +12.2% YoY suggests a recovery trend. AI-led deals, cloud migration mandates, and managed services partnerships (Canada Life, Nokian Tyres, Oracle) point to potential reacceleration. Growth trajectory: <span style="font-weight:500">Slowing → Early signs of recovery.</span></p>
+  </div>
+</div>
+
+<div id="health" class="panel">
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">D/E ratio</div><div class="metric-val">~0.0</div><div class="metric-sub source-tag">Virtually debt-free</div></div>
+    <div class="metric-card"><div class="metric-label">FCF (TTM)</div><div class="metric-val">₹46,251 Cr</div><div class="metric-sub source-tag">TipRanks</div></div>
+    <div class="metric-card"><div class="metric-label">Operating CF</div><div class="metric-val">₹50,410 Cr</div><div class="metric-sub source-tag">TipRanks</div></div>
+    <div class="metric-card"><div class="metric-label">Payout ratio</div><div class="metric-val">63.9%</div><div class="metric-sub source-tag">TipRanks</div></div>
+    <div class="metric-card"><div class="metric-label">EBITDA</div><div class="metric-val">₹71,369 Cr</div><div class="metric-sub source-tag">TipRanks</div></div>
+    <div class="metric-card"><div class="metric-label">Asset turnover</div><div class="metric-val">1.74x</div><div class="metric-sub source-tag">TipRanks</div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Financial health summary</div>
+    <div class="strength">
+      <div class="s-icon s-green"><i class="ti ti-check" aria-hidden="true"></i></div>
+      <div><div class="s-title">Debt: Safe (D/E ~0)</div><div class="s-desc">TCS is virtually debt-free. No interest coverage risk. This is the gold standard for financial health. (Source: Multiple)</div></div>
+    </div>
+    <div class="strength">
+      <div class="s-icon s-green"><i class="ti ti-check" aria-hidden="true"></i></div>
+      <div><div class="s-title">FCF: Strong & positive</div><div class="s-desc">Free cash flow of ₹46,251 Cr TTM. Positive and substantial — funds dividends, buybacks, and R&D comfortably. (Source: TipRanks)</div></div>
+    </div>
+    <div class="strength">
+      <div class="s-icon s-green"><i class="ti ti-check" aria-hidden="true"></i></div>
+      <div><div class="s-title">ROE & ROCE: Strong</div><div class="s-desc">ROE of 45.6% and ROCE of 54.9% are well above the >15% threshold for strength — reflecting capital-light, high-margin business model. (Source: Dhan)</div></div>
+    </div>
+    <div class="strength">
+      <div class="s-icon s-red"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div>
+      <div><div class="s-title">Legal exposure: Watch</div><div class="s-desc">$220M total exposure in DXC trade secrets case after US Supreme Court ruling. $70M exceptional charge in Q1 FY27. (Source: Groww)</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="peers" class="panel">
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="peer-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>CMP (₹)</th>
+          <th>Mkt Cap</th>
+          <th>P/E</th>
+          <th>P/B</th>
+          <th>ROE %</th>
+          <th>D/E</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight">
+          <td>TCS ★</td><td>2,185</td><td>₹7.86L Cr</td><td>15.8x</td><td>7.3x</td><td>45.6%</td><td>~0</td>
+        </tr>
+        <tr>
+          <td>Infosys</td><td>~1,174</td><td>~₹4.9L Cr</td><td>24.3x</td><td>~8x</td><td>~32%</td><td>~0</td>
+        </tr>
+        <tr>
+          <td>HCL Tech</td><td>~1,142</td><td>~₹3.1L Cr</td><td>25.5x</td><td>~7x</td><td>~28%</td><td>~0.1</td>
+        </tr>
+        <tr>
+          <td>Wipro</td><td>~182</td><td>~₹1.9L Cr</td><td>~22x</td><td>~3x</td><td>~17%</td><td>~0.1</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px">Sources: Yahoo Finance, MarketsMojo, Angel One · Peer figures approximate as of mid-June 2026</div>
+
+  <div class="card" style="margin-top:1rem">
+    <div class="section-title">Where TCS stands out vs. peers</div>
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">TCS leads peers on ROE (45.6% vs. Infosys ~32%) and commands the largest market cap, reflecting brand premium and client stability. Its P/E at 15.8x is now <strong style="font-weight:500">lower than all major peers</strong> (Infosys 24x, HCL 25.5x), an unusual inversion. Scale advantage (~6L+ employees, 55 countries) remains unmatched. The $220M legal charge is a near-term overhang not visible in peer books.</p>
+  </div>
+</div>
+
+<div id="ownership" class="panel">
+  <div class="card">
+    <div class="section-title">Shareholding pattern (Mar 2026)</div>
+    <div class="ow-bar-wrap">
+      <div class="ow-label"><span>Promoters (Tata Sons)</span><span style="font-weight:500">71.77%</span></div>
+      <div class="ow-bar"><div class="ow-fill" style="width:71.77%;background:#1D9E75"></div></div>
+    </div>
+    <div class="ow-bar-wrap">
+      <div class="ow-label"><span>DII (Domestic Institutions)</span><span style="font-weight:500">13.41%</span></div>
+      <div class="ow-bar"><div class="ow-fill" style="width:13.41%;background:#378ADD"></div></div>
+    </div>
+    <div class="ow-bar-wrap">
+      <div class="ow-label"><span>FII (Foreign Institutions)</span><span style="font-weight:500">9.66%</span></div>
+      <div class="ow-bar"><div class="ow-fill" style="width:9.66%;background:#EF9F27"></div></div>
+    </div>
+    <div class="ow-bar-wrap">
+      <div class="ow-label"><span>MF (Mutual Funds)</span><span style="font-weight:500">5.77%</span></div>
+      <div class="ow-bar"><div class="ow-fill" style="width:5.77%;background:#7F77DD"></div></div>
+    </div>
+    <div class="ow-bar-wrap">
+      <div class="ow-label"><span>Public</span><span style="font-weight:500">4.52%</span></div>
+      <div class="ow-bar"><div class="ow-fill" style="width:4.52%;background:#D3D1C7"></div></div>
+    </div>
+    <div class="ow-bar-wrap">
+      <div class="ow-label"><span>Government</span><span style="font-weight:500">0.00%</span></div>
+      <div class="ow-bar"><div class="ow-fill" style="width:0%;background:#D3D1C7"></div></div>
+    </div>
+    <div style="font-size:11px;color:var(--color-text-secondary);margin-top:10px">Source: Dhan · Pledging: 0% (no promoter pledging flagged)</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Ownership assessment</div>
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">Promoter holding of 71.77% by Tata Sons reflects exceptionally high founder-group commitment — well above the 🚩 pledge flag threshold of >10% pledging, but here pledge is 0%. FII holding at 9.66% has likely declined due to global IT sector rerating and the stock's underperformance. DII accumulation at 13.41% suggests domestic institutional confidence. Shares outstanding reduced by 2.65% YoY, indicating active buybacks that support EPS. Overall ownership structure: <strong style="font-weight:500">High quality — no governance red flags.</strong></p>
+  </div>
+</div>
+
+<div id="view" class="panel">
+  <div class="card">
+    <div class="section-title" style="margin-bottom:12px">3 fundamental strengths</div>
+    <div class="strength">
+      <div class="s-icon s-green"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+      <div><div class="s-title">Zero-debt, FCF machine</div><div class="s-desc">D/E of ~0 and FCF of ₹46,251 Cr TTM. Virtually no financial risk; cash flows fund 5.1% dividend yield and buybacks without strain.</div></div>
+    </div>
+    <div class="strength">
+      <div class="s-icon s-green"><i class="ti ti-world" aria-hidden="true"></i></div>
+      <div><div class="s-title">Unmatched scale and client stickiness</div><div class="s-desc">Operations in 55 countries, 6L+ employees, and decades-long client relationships in BFSI, retail, and manufacturing — a wide economic moat with high switching costs.</div></div>
+    </div>
+    <div class="strength">
+      <div class="s-icon s-green"><i class="ti ti-chart-pie" aria-hidden="true"></i></div>
+      <div><div class="s-title">ROE and ROCE far above average</div><div class="s-desc">ROE of 45.6% and ROCE of 54.9% place TCS in the top tier of Indian large-caps, reflecting a capital-light model with high operating leverage.</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title" style="margin-bottom:12px">2 watch-points</div>
+    <div class="strength">
+      <div class="s-icon s-red"><i class="ti ti-trending-down" aria-hidden="true"></i></div>
+      <div><div class="s-title">Revenue growth slowdown</div><div class="s-desc">5-year sales CAGR of 10.2% is modest for a large-cap IT company. Global IT discretionary spending weakness and macro headwinds are suppressing deal ramp-ups. Monitor quarterly revenue growth for reacceleration signals.</div></div>
+    </div>
+    <div class="strength">
+      <div class="s-icon s-red"><i class="ti ti-gavel" aria-hidden="true"></i></div>
+      <div><div class="s-title">$220M US legal exposure</div><div class="s-desc">DXC trade-secrets judgment upheld by US Supreme Court. TCS must provision $70M more in Q1 FY27 (exceptional charge). Though manageable given TCS's balance sheet, this creates short-term earnings noise and reputational risk in US market.</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+      <div class="section-title" style="margin-bottom:0">Fundamental quality</div>
+      <span class="verdict-chip chip-str">Strong</span>
+    </div>
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">TCS demonstrates strong fundamentals: zero debt, high ROE/ROCE, dominant market position, and consistent free cash flow generation. The near-term headwinds (legal charge, muted revenue growth) are real but not balance-sheet threatening. Data confidence: <strong style="font-weight:500">High</strong> (figures cross-verified from Screener, Tickertape, TipRanks, Angel One, Dhan, HDFC Sec).</p>
+    <div class="section-title" style="margin-top:12px;margin-bottom:6px">Key metric to track</div>
+    <p style="font-size:13px;color:var(--color-text-secondary)">Watch <strong style="font-weight:500">quarterly revenue growth (CC terms)</strong> — any re-acceleration above 8% YoY would signal demand recovery. Also track FII holding changes each quarter as a sentiment indicator.</p>
+    <div class="disclaimer">This is a view of the fundamentals for educational purposes only. It is not investment advice and not a buy/sell/hold recommendation. Verify all figures independently before making any financial decision. The final decision is yours.</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+const textColor = isDark ? '#aaa' : '#888';
+
+new Chart(document.getElementById('priceChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26','Apr 26','May 26','Jun 26'],
+    datasets: [{
+      label: 'TCS Price (₹)',
+      data: [3500,3400,3350,3200,3000,2900,2750,2600,2500,2400,2300,2200,2185],
+      borderColor: '#1D9E75',
+      backgroundColor: 'rgba(29,158,117,0.08)',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.3,
+      pointRadius: 3,
+      pointBorderWidth: 0,
+      pointBackgroundColor: '#1D9E75'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: textColor, font: { size: 11 }, autoSkip: false, maxRotation: 45 }, grid: { color: gridColor } },
+      y: { ticks: { color: textColor, font: { size: 11 }, callback: v => '₹' + v.toLocaleString('en-IN') }, grid: { color: gridColor } }
+    }
+  }
+});
+
+new Chart(document.getElementById('peChart'), {
+  type: 'bar',
+  data: {
+    labels: ['TCS now', '5Y avg', 'Sector avg', 'Infosys', 'HCL Tech'],
+    datasets: [{
+      data: [15.8, 25, 22, 24.3, 25.5],
+      backgroundColor: ['#1D9E75','#D3D1C7','#D3D1C7','#B5D4F4','#B5D4F4'],
+      borderRadius: 4,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: textColor, font: { size: 11 } }, grid: { color: gridColor } },
+      y: { ticks: { color: textColor, font: { size: 11 }, callback: v => v + 'x' }, grid: { color: gridColor }, min: 0, max: 30 }
+    }
+  }
+});
+
+new Chart(document.getElementById('profitChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Q1 FY26', 'Q2 FY26', 'Q3 FY26', 'Q4 FY26'],
+    datasets: [{
+      label: 'Net Profit (₹ Cr)',
+      data: [10900, 11909, 10657, 13718],
+      backgroundColor: ['#9FE1CB','#9FE1CB','#F5C4B3','#1D9E75'],
+      borderRadius: 4,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: textColor, font: { size: 12 } }, grid: { color: gridColor } },
+      y: { ticks: { color: textColor, font: { size: 11 }, callback: v => '₹' + (v/1000).toFixed(0) + 'K Cr' }, grid: { color: gridColor }, min: 8000 }
+    }
+  }
+});
+</script>
