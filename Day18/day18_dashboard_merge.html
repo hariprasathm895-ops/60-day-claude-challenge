@@ -1,0 +1,190 @@
+<style>
+:root{
+  --bg:#f5f6fb; --surface:#ffffff; --border:#e7e9f2;
+  --text:#1a1d29; --text-dim:#6a7187; --text-faint:#9aa0b8;
+  --accent:#6366f1; --accent-soft:#eef0ff;
+  --radius:14px; --shadow:0 1px 2px rgba(16,24,40,.04),0 6px 16px rgba(16,24,40,.05);
+  --red:#ef4444; --red-bg:#fee2e2;
+  --orange:#f59e0b; --orange-bg:#fef3c7;
+  --green:#10b981; --green-bg:#d1fae5;
+  --blue:#3b82f6; --blue-bg:#dbeafe;
+  --amber:#f97316; --amber-bg:#ffedd5;
+  --grey:#6b7280; --grey-bg:#eef0f4;
+  --s1:#0ea5e9; --s2:#d946ef;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Inter,Roboto,sans-serif;}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 20px 70px;}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:22px;}
+.top h1{font-size:25px;margin:0 0 4px;font-weight:800;letter-spacing:-.01em;}
+.top .meta{color:var(--text-dim);font-size:13.5px;}
+.mode-tag{background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12px;padding:6px 14px;border-radius:20px;}
+.grid{display:grid;gap:18px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;}
+.card h2{font-size:15px;margin:0 0 14px;font-weight:750;display:flex;align-items:center;gap:8px;}
+.card h2 .count{font-size:11.5px;color:var(--text-faint);font-weight:600;background:var(--grey-bg);border-radius:10px;padding:2px 9px;}
+.summary-text{font-size:14.5px;line-height:1.65;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{text-align:left;color:var(--text-faint);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--border);}
+td{padding:12px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafbff;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+.b-high{background:var(--red-bg);color:#b91c1c;}
+.b-med{background:var(--orange-bg);color:#b45309;}
+.b-conflict{background:var(--amber-bg);color:#c2410c;}
+.b-question{background:var(--blue-bg);color:#1d4ed8;}
+.b-pending{background:var(--grey-bg);color:#4b5563;}
+.src-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;color:#fff;white-space:nowrap;}
+.list-item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px;line-height:1.55;}
+.list-item:last-child{border-bottom:none;}
+.list-item .badge,.list-item .src-tag{flex-shrink:0;margin-top:1px;}
+.conflict-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;border:1px solid var(--amber-bg);background:#fffaf5;border-radius:12px;margin-bottom:12px;}
+.conflict-row:last-child{margin-bottom:0;}
+.conflict-row .col{font-size:13px;line-height:1.5;}
+.conflict-row .col .src-tag{margin-bottom:6px;display:inline-block;}
+.conflict-row .field{grid-column:1/-1;font-weight:750;font-size:13.5px;margin-bottom:4px;}
+.source-card{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px;}
+.source-card:last-child{margin-bottom:0;}
+.source-card .stxt{font-size:13.5px;}
+.source-card .stxt b{display:block;font-size:13.5px;}
+.source-card .stxt span{color:var(--text-dim);font-size:12.5px;}
+details{border:1px solid var(--border);border-radius:12px;padding:12px 16px;background:#fafbfd;}
+details summary{cursor:pointer;font-weight:700;font-size:13.5px;outline:none;}
+details[open] summary{margin-bottom:8px;}
+.not-specified{color:var(--text-faint);font-style:italic;}
+@media(max-width:760px){
+  .conflict-row{grid-template-columns:1fr;}
+  table, thead, tbody, th, td, tr{display:block;}
+  thead{display:none;}
+  td{border:none;padding:4px 0;}
+  tr{border-bottom:1px solid var(--border);padding:10px 0;}
+  td:before{content:attr(data-label);display:block;font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+}
+</style>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <h1>AvenoraHub — Merged Meeting Notes</h1>
+      <div class="meta">Same sprint call · Two separate personal notes merged</div>
+    </div>
+    <span class="mode-tag">MERGE MODE</span>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>📋 Summary</h2>
+      <div class="summary-text">
+        Two teammates' personal notes from the same sprint call were merged: Hari's notes and Priya's notes. Both cover the login page, the API blocking issue, and the demo-video screens deadline, but disagree on the exact dates for all three. Priya's notes additionally raise a database decision not mentioned in Hari's notes; Hari's notes additionally flag an exam-week risk not mentioned in Priya's.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⭐ Key Takeaways</h2>
+      <div class="summary-text" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;">
+        <div class="card" style="box-shadow:none;background:var(--accent-soft);border-color:#e0e3fb;"><b>3 overlapping items</b><br>Login page, API fix, and demo screens are mentioned in both notes — each with a different deadline.</div>
+        <div class="card" style="box-shadow:none;background:var(--accent-soft);border-color:#e0e3fb;"><b>1 item unique to Priya's notes</b><br>Deciding the database choice "by this week" — not mentioned by Hari.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>✅ Action Items (Merged) <span class="count">4</span></h2>
+      <table>
+        <thead><tr><th>Task</th><th>Owner</th><th>Deadline</th><th>Status</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr>
+            <td data-label="Task">Finish login page</td><td data-label="Owner">Hari</td>
+            <td data-label="Deadline">Friday / Saturday (conflicting)</td>
+            <td data-label="Status"><span class="badge b-conflict">⚠️ Conflict</span></td>
+            <td data-label="Source"><span class="src-tag" style="background:var(--s1)">Hari's Notes</span> <span class="src-tag" style="background:var(--s2)">Priya's Notes</span></td>
+          </tr>
+          <tr>
+            <td data-label="Task">Fix API blocking issue</td><td data-label="Owner">Priya</td>
+            <td data-label="Deadline">Not specified / Monday (conflicting)</td>
+            <td data-label="Status"><span class="badge b-high">🔴 High Priority</span> <span class="badge b-conflict">⚠️ Conflict</span></td>
+            <td data-label="Source"><span class="src-tag" style="background:var(--s1)">Hari's Notes</span> <span class="src-tag" style="background:var(--s2)">Priya's Notes</span></td>
+          </tr>
+          <tr>
+            <td data-label="Task">Deliver final screens for demo video</td><td data-label="Owner">Hari &amp; Priya</td>
+            <td data-label="Deadline">22nd / 23rd (conflicting)</td>
+            <td data-label="Status"><span class="badge b-conflict">⚠️ Conflict</span></td>
+            <td data-label="Source"><span class="src-tag" style="background:var(--s1)">Hari's Notes</span> <span class="src-tag" style="background:var(--s2)">Priya's Notes</span></td>
+          </tr>
+          <tr>
+            <td data-label="Task">Decide on database choice</td><td data-label="Owner"><span class="not-specified">Not specified</span></td>
+            <td data-label="Deadline">This week</td>
+            <td data-label="Status"><span class="badge b-pending">⏳ Pending</span></td>
+            <td data-label="Source"><span class="src-tag" style="background:var(--s2)">Priya's Notes</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>🔁 Duplicate Items <span class="count">3</span></h2>
+      <div class="list-item"><span class="src-tag" style="background:var(--s1)">Hari</span><span class="src-tag" style="background:var(--s2)">Priya</span>"Finish login page" appears in both notes.</div>
+      <div class="list-item"><span class="src-tag" style="background:var(--s1)">Hari</span><span class="src-tag" style="background:var(--s2)">Priya</span>"Fix API blocking issue" appears in both notes (Priya's note frames it as a hosting migration).</div>
+      <div class="list-item"><span class="src-tag" style="background:var(--s1)">Hari</span><span class="src-tag" style="background:var(--s2)">Priya</span>"Deliver final screens for demo video" appears in both notes.</div>
+    </div>
+
+    <div class="card">
+      <h2>🛠️ Conflict Resolution Review <span class="count">3</span></h2>
+      <div class="conflict-row">
+        <div class="field">Login page deadline</div>
+        <div class="col"><span class="src-tag" style="background:var(--s1)">Hari's Notes</span><br>Friday</div>
+        <div class="col"><span class="src-tag" style="background:var(--s2)">Priya's Notes</span><br>Saturday (attributed to "Hari said Saturday actually")</div>
+      </div>
+      <div class="conflict-row">
+        <div class="field">API fix deadline</div>
+        <div class="col"><span class="src-tag" style="background:var(--s1)">Hari's Notes</span><br><span class="not-specified">Not specified — only "high priority"</span></div>
+        <div class="col"><span class="src-tag" style="background:var(--s2)">Priya's Notes</span><br>"By Monday, not Friday"</div>
+      </div>
+      <div class="conflict-row">
+        <div class="field">Demo video screens deadline</div>
+        <div class="col"><span class="src-tag" style="background:var(--s1)">Hari's Notes</span><br>22nd</div>
+        <div class="col"><span class="src-tag" style="background:var(--s2)">Priya's Notes</span><br>23rd ("I think")</div>
+      </div>
+      <p style="font-size:12.5px;color:var(--text-faint);margin:12px 0 0;">These conflicts are presented as-is for manual resolution — none have been automatically resolved.</p>
+    </div>
+
+    <div class="card">
+      <h2>❓ Open Questions <span class="count">1</span></h2>
+      <div class="list-item"><span class="badge b-question">❓ Open</span>Which database (MySQL or Firebase, per earlier discussion) should be decided on this week? Raised only in Priya's notes, no decision recorded.</div>
+    </div>
+
+    <div class="card">
+      <h2>⚠️ Risks / Blockers <span class="count">1</span></h2>
+      <div class="list-item"><span class="badge b-med">🟠 Risk</span>Exam week starting the 28th — raised only in Hari's notes, may affect testing-phase availability.</div>
+    </div>
+
+    <div class="card">
+      <h2>⚠️ Conflicts <span class="count">3</span></h2>
+      <div class="list-item"><span class="badge b-conflict">⚠️ Conflict</span>Login page deadline: Friday (Hari's notes) vs Saturday (Priya's notes).</div>
+      <div class="list-item"><span class="badge b-conflict">⚠️ Conflict</span>API fix deadline: not specified (Hari's notes) vs Monday (Priya's notes).</div>
+      <div class="list-item"><span class="badge b-conflict">⚠️ Conflict</span>Demo screens deadline: 22nd (Hari's notes) vs 23rd (Priya's notes).</div>
+    </div>
+
+    <div class="card">
+      <h2>🗒️ Additional Notes</h2>
+      <details>
+        <summary>Supporting context (1 item)</summary>
+        <div class="list-item">Priya's note describes the API issue specifically as needing a "hosting migration" — Hari's note does not include this detail, only that Priya is "fixing the API blocking issue, high priority."</div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>📂 Source Information</h2>
+      <div class="source-card">
+        <div class="stxt"><b>Hari's Notes</b><span>Personal notes taken during the sprint call</span></div>
+        <span class="src-tag" style="background:var(--s1)">Source 1</span>
+      </div>
+      <div class="source-card">
+        <div class="stxt"><b>Priya's Notes</b><span>Personal notes taken during the same sprint call</span></div>
+        <span class="src-tag" style="background:var(--s2)">Source 2</span>
+      </div>
+    </div>
+
+  </div>
+</div>

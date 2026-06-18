@@ -1,0 +1,162 @@
+<style>
+:root{
+  --bg:#f5f6fb; --surface:#ffffff; --border:#e7e9f2;
+  --text:#1a1d29; --text-dim:#6a7187; --text-faint:#9aa0b8;
+  --accent:#6366f1; --accent-soft:#eef0ff;
+  --radius:14px; --shadow:0 1px 2px rgba(16,24,40,.04),0 6px 16px rgba(16,24,40,.05);
+  --red:#ef4444; --red-bg:#fee2e2;
+  --orange:#f59e0b; --orange-bg:#fef3c7;
+  --green:#10b981; --green-bg:#d1fae5;
+  --blue:#3b82f6; --blue-bg:#dbeafe;
+  --amber:#f97316; --amber-bg:#ffedd5;
+  --grey:#6b7280; --grey-bg:#eef0f4;
+  --p1:#6366f1; --p2:#0ea5e9; --p3:#d946ef;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Inter,Roboto,sans-serif;}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 20px 70px;}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:22px;}
+.top h1{font-size:25px;margin:0 0 4px;font-weight:800;letter-spacing:-.01em;}
+.top .meta{color:var(--text-dim);font-size:13.5px;}
+.mode-tag{background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12px;padding:6px 14px;border-radius:20px;}
+.grid{display:grid;gap:18px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;}
+.card h2{font-size:15px;margin:0 0 14px;font-weight:750;display:flex;align-items:center;gap:8px;}
+.card h2 .count{font-size:11.5px;color:var(--text-faint);font-weight:600;background:var(--grey-bg);border-radius:10px;padding:2px 9px;}
+.summary-text{font-size:14.5px;line-height:1.65;}
+.speaker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.speaker-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.speaker-card .name{display:flex;align-items:center;gap:8px;font-weight:750;font-size:14px;margin-bottom:8px;}
+.speaker-card .dot{width:9px;height:9px;border-radius:50%;}
+.speaker-card p{font-size:13px;color:var(--text-dim);line-height:1.55;margin:0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{text-align:left;color:var(--text-faint);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--border);}
+td{padding:12px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafbff;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+.b-high{background:var(--red-bg);color:#b91c1c;}
+.b-med{background:var(--orange-bg);color:#b45309;}
+.b-conflict{background:var(--amber-bg);color:#c2410c;}
+.b-question{background:var(--blue-bg);color:#1d4ed8;}
+.b-pending{background:var(--grey-bg);color:#4b5563;}
+.speaker-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;color:#fff;}
+.list-item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px;line-height:1.55;}
+.list-item:last-child{border-bottom:none;}
+.list-item .badge,.list-item .speaker-tag{flex-shrink:0;margin-top:1px;}
+details{border:1px solid var(--border);border-radius:12px;padding:12px 16px;background:#fafbfd;}
+details summary{cursor:pointer;font-weight:700;font-size:13.5px;outline:none;}
+details[open] summary{margin-bottom:8px;}
+.not-specified{color:var(--text-faint);font-style:italic;}
+@media(max-width:760px){
+  .speaker-grid{grid-template-columns:1fr;}
+  table, thead, tbody, th, td, tr{display:block;}
+  thead{display:none;}
+  td{border:none;padding:4px 0;}
+  tr{border-bottom:1px solid var(--border);padding:10px 0;}
+  td:before{content:attr(data-label);display:block;font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+}
+</style>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <h1>Team Yudhistra — Standup Call</h1>
+      <div class="meta">Voice memo transcript · Speakers: Hari, Mentor Arjun, Sneha</div>
+    </div>
+    <span class="mode-tag">TRANSCRIPT MODE</span>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>📋 Summary</h2>
+      <div class="summary-text">
+        Standup call on Scanly progress: offline face recognition via MobileFaceNet ONNX is integrated and tested at ~91% accuracy on 20 sample faces. Mentor Arjun pushed for higher accuracy ahead of the NHAI review. Sneha raised an unresolved Android 14 camera-permission crash. The exact demo day — stated as both the 29th and 30th by different speakers — was left to be confirmed, along with ownership of the SIH PPT update.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎙️ Speaker Summary</h2>
+      <div class="speaker-grid">
+        <div class="speaker-card">
+          <div class="name"><span class="dot" style="background:var(--p1)"></span>Hari</div>
+          <p>Reported MobileFaceNet ONNX integration into the React Native app, offline recognition working at ~91% accuracy on 20 sample faces. Took up the accuracy-improvement task and flagged the 28th as the offline-mode stability deadline.</p>
+        </div>
+        <div class="speaker-card">
+          <div class="name"><span class="dot" style="background:var(--p2)"></span>Mentor Arjun</div>
+          <p>Asked for accuracy to reach at least 95% before the review on the 30th. Asked Sneha for crash logs and offered to check NHAI's device list and confirm the exact demo date with the SIH coordinator.</p>
+        </div>
+        <div class="speaker-card">
+          <div class="name"><span class="dot" style="background:var(--p3)"></span>Sneha</div>
+          <p>Reported an unresolved Android 14 camera-permission crash, cause not yet identified. Flagged a date discrepancy on the demo day, and raised that the SIH PPT screenshot update has no owner.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🧭 Decisions by Speaker</h2>
+      <div class="list-item"><span class="speaker-tag" style="background:var(--p1)">Hari</span>Will work on lighting normalization to improve recognition accuracy.</div>
+      <div class="list-item"><span class="speaker-tag" style="background:var(--p2)">Arjun</span>Will check NHAI's test device list and confirm the exact demo date with the SIH coordinator.</div>
+      <div class="list-item"><span class="speaker-tag" style="background:var(--p3)">Sneha</span>Will send crash logs for the Android 14 permission issue today.</div>
+    </div>
+
+    <div class="card">
+      <h2>✅ Action Items by Speaker <span class="count">3</span></h2>
+      <table>
+        <thead><tr><th>Speaker</th><th>Task</th><th>Deadline</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr>
+            <td data-label="Speaker"><span class="speaker-tag" style="background:var(--p1)">Hari</span></td>
+            <td data-label="Task">Improve recognition accuracy via lighting normalization (target ≥95%)</td>
+            <td data-label="Deadline">Next week</td>
+            <td data-label="Status"><span class="badge b-high">🔴 High Priority</span> <span class="badge b-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td data-label="Speaker"><span class="speaker-tag" style="background:var(--p3)">Sneha</span></td>
+            <td data-label="Task">Send crash logs for Android 14 camera-permission issue</td>
+            <td data-label="Deadline">Today</td>
+            <td data-label="Status"><span class="badge b-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td data-label="Speaker"><span class="speaker-tag" style="background:var(--p2)">Arjun</span></td>
+            <td data-label="Task">Check NHAI device list &amp; confirm exact demo date</td>
+            <td data-label="Deadline"><span class="not-specified">Not specified</span></td>
+            <td data-label="Status"><span class="badge b-pending">⏳ Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>🗒️ Attribution Notes</h2>
+      <div class="list-item"><span class="badge b-question">❓ Unclear</span>Updating the SIH PPT with the latest screenshots was raised by Sneha, but no speaker was assigned ownership — explicitly left as "we'll figure out after this call."</div>
+    </div>
+
+    <div class="card">
+      <h2>❓ Open Questions <span class="count">2</span></h2>
+      <div class="list-item"><span class="badge b-question">❓ Open</span>What is the confirmed demo day — the 29th or the 30th? Speakers stated different dates.</div>
+      <div class="list-item"><span class="badge b-question">❓ Open</span>Who will update the SIH PPT with the latest screenshots? Unassigned at end of call.</div>
+    </div>
+
+    <div class="card">
+      <h2>⚠️ Risks / Blockers <span class="count">2</span></h2>
+      <div class="list-item"><span class="badge b-high">🔴 Blocker</span>Android 14 camera-permission crash is unresolved; cause (React Native version vs device-specific) not yet identified.</div>
+      <div class="list-item"><span class="badge b-med">🟠 Risk</span>Current accuracy (~91%) is below the mentor's requested ≥95% threshold ahead of the NHAI review.</div>
+    </div>
+
+    <div class="card">
+      <h2>⚠️ Conflicts <span class="count">1</span></h2>
+      <div class="list-item"><span class="badge b-conflict">⚠️ Conflict</span>Demo day stated as the 30th by Hari, but Sneha says she heard the 29th from elsewhere in the group — not reconciled on the call.</div>
+    </div>
+
+    <div class="card">
+      <h2>🗒️ Additional Notes</h2>
+      <details>
+        <summary>Supporting context (1 item)</summary>
+        <div class="list-item">Sample size for the 91% accuracy figure was 20 faces — noted as-is, no statement on whether this sample is considered representative.</div>
+      </details>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,178 @@
+<style>
+:root{
+  --bg:#f5f6fb; --surface:#ffffff; --border:#e7e9f2;
+  --text:#1a1d29; --text-dim:#6a7187; --text-faint:#9aa0b8;
+  --accent:#6366f1; --accent-soft:#eef0ff;
+  --radius:14px; --shadow:0 1px 2px rgba(16,24,40,.04),0 6px 16px rgba(16,24,40,.05);
+  --red:#ef4444; --red-bg:#fee2e2;
+  --orange:#f59e0b; --orange-bg:#fef3c7;
+  --green:#10b981; --green-bg:#d1fae5;
+  --blue:#3b82f6; --blue-bg:#dbeafe;
+  --amber:#f97316; --amber-bg:#ffedd5;
+  --grey:#6b7280; --grey-bg:#eef0f4;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Inter,Roboto,sans-serif;}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 20px 70px;}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:22px;}
+.top h1{font-size:25px;margin:0 0 4px;font-weight:800;letter-spacing:-.01em;}
+.top .meta{color:var(--text-dim);font-size:13.5px;}
+.mode-tag{background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12px;padding:6px 14px;border-radius:20px;letter-spacing:.02em;}
+.grid{display:grid;gap:18px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;}
+.card h2{font-size:15px;margin:0 0 14px;font-weight:750;display:flex;align-items:center;gap:8px;}
+.card h2 .count{font-size:11.5px;color:var(--text-faint);font-weight:600;background:var(--grey-bg);border-radius:10px;padding:2px 9px;}
+.summary-text{font-size:14.5px;line-height:1.65;color:var(--text);}
+.takeaway-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.takeaway{background:var(--accent-soft);border-radius:12px;padding:14px 16px;font-size:13.5px;line-height:1.5;border:1px solid #e0e3fb;}
+.takeaway b{display:block;font-size:12px;color:var(--accent);margin-bottom:5px;letter-spacing:.02em;text-transform:uppercase;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{text-align:left;color:var(--text-faint);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--border);}
+td{padding:12px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafbff;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+.b-high{background:var(--red-bg);color:#b91c1c;}
+.b-med{background:var(--orange-bg);color:#b45309;}
+.b-low{background:var(--green-bg);color:#047857;}
+.b-conflict{background:var(--amber-bg);color:#c2410c;}
+.b-question{background:var(--blue-bg);color:#1d4ed8;}
+.b-done{background:var(--green-bg);color:#047857;}
+.b-pending{background:var(--grey-bg);color:#4b5563;}
+.list-item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px;line-height:1.55;}
+.list-item:last-child{border-bottom:none;}
+.list-item .badge{flex-shrink:0;margin-top:1px;}
+.filterbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.filterbar button{border:1px solid var(--border);background:var(--surface);color:var(--text-dim);font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:20px;cursor:pointer;transition:.15s;}
+.filterbar button.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.filterbar button:hover{border-color:var(--accent);}
+details{border:1px solid var(--border);border-radius:12px;padding:12px 16px;background:#fafbfd;}
+details summary{cursor:pointer;font-weight:700;font-size:13.5px;color:var(--text);outline:none;}
+details[open] summary{margin-bottom:8px;}
+details p, details .list-item{font-size:13px;}
+.not-specified{color:var(--text-faint);font-style:italic;}
+@media(max-width:760px){
+  .takeaway-grid{grid-template-columns:1fr;}
+  table, thead, tbody, th, td, tr{display:block;}
+  thead{display:none;}
+  td{border:none;padding:4px 0;}
+  tr{border-bottom:1px solid var(--border);padding:10px 0;}
+  td:before{content:attr(data-label);display:block;font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+}
+</style>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <h1>AvenoraHub — Sprint Planning Call</h1>
+      <div class="meta">Wednesday team call · Brain-dump notes · Source: raw text dump</div>
+    </div>
+    <span class="mode-tag">FULL BREAKDOWN MODE</span>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>📋 Summary</h2>
+      <div class="summary-text">
+        Wednesday team call covering AvenoraHub sprint progress: login page nearing completion, an API blocker on course upload tied to a backend hosting issue, an unconfirmed owner for the quiz module, the SIH demo video timeline, a parked gamification idea, an unresolved database choice between MySQL and Firebase, an unexpected hosting bill, and onboarding for a new team member, Karthik.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⭐ Key Takeaways</h2>
+      <div class="takeaway-grid">
+        <div class="takeaway"><b>Login Page</b>Hari is finishing the login page, targeted for Friday.</div>
+        <div class="takeaway"><b>API Blocker</b>Priya is fixing the course-upload API issue, blocked on backend hosting (Render free tier problem); flagged high priority.</div>
+        <div class="takeaway"><b>SIH Demo Video</b>Due the 25th. Deepika is making it but needs final screens from Hari and Priya by the 22nd.</div>
+        <div class="takeaway"><b>Gamification</b>Badges/points idea discussed — parked for v2, not in current sprint.</div>
+        <div class="takeaway"><b>Hosting Bill</b>Render free tier expired; team was charged ₹700 unexpectedly.</div>
+        <div class="takeaway"><b>New Member</b>Karthik is joining the team late; an onboarding doc is needed.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>✅ Action Items <span class="count">6</span></h2>
+      <div class="filterbar" id="filterbar">
+        <button class="active" data-f="all">All</button>
+        <button data-f="high">High Priority</button>
+        <button data-f="pending">Pending</button>
+      </div>
+      <table id="actionTable">
+        <thead><tr><th>Task</th><th>Owner</th><th>Deadline</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr data-status="pending" data-priority="med">
+            <td data-label="Task">Finish login page</td><td data-label="Owner">Hari</td><td data-label="Deadline">Friday</td>
+            <td data-label="Status"><span class="badge b-pending">⏳ Pending</span></td>
+          </tr>
+          <tr data-status="pending" data-priority="high">
+            <td data-label="Task">Fix API blocking issue (backend hosting)</td><td data-label="Owner">Priya</td><td data-label="Deadline">ASAP</td>
+            <td data-label="Status"><span class="badge b-high">🔴 High Priority</span> <span class="badge b-pending">⏳ Pending</span></td>
+          </tr>
+          <tr data-status="pending" data-priority="med">
+            <td data-label="Task">Deliver final screens for demo video</td><td data-label="Owner">Hari &amp; Priya</td><td data-label="Deadline">22nd</td>
+            <td data-label="Status"><span class="badge b-pending">⏳ Pending</span></td>
+          </tr>
+          <tr data-status="pending" data-priority="med">
+            <td data-label="Task">Make SIH demo video</td><td data-label="Owner">Deepika</td><td data-label="Deadline">25th</td>
+            <td data-label="Status"><span class="badge b-pending">⏳ Pending</span></td>
+          </tr>
+          <tr data-status="pending" data-priority="low">
+            <td data-label="Task">Create onboarding doc for Karthik</td><td data-label="Owner"><span class="not-specified">Not specified</span></td><td data-label="Deadline"><span class="not-specified">Not specified</span></td>
+            <td data-label="Status"><span class="badge b-pending">⏳ Pending</span></td>
+          </tr>
+          <tr data-status="pending" data-priority="med">
+            <td data-label="Task">Check unexpected ₹700 hosting bill</td><td data-label="Owner">Priya</td><td data-label="Deadline"><span class="not-specified">Not specified</span></td>
+            <td data-label="Status"><span class="badge b-pending">⏳ Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>❓ Open Questions <span class="count">5</span></h2>
+      <div class="list-item"><span class="badge b-question">❓ Open</span>Who owns the quiz module? No one confirmed ownership on the call.</div>
+      <div class="list-item"><span class="badge b-question">❓ Open</span>Is the SIH travel budget of ₹5000 per head confirmed by the mentor? Stated as unconfirmed.</div>
+      <div class="list-item"><span class="badge b-question">❓ Open</span>Do they need a privacy policy page for the SIH submission?</div>
+      <div class="list-item"><span class="badge b-question">❓ Open</span>Next sync meeting — Thursday or Friday — not fixed yet.</div>
+      <div class="list-item"><span class="badge b-question">❓ Open</span>Who will update the SIH PPT with the latest screenshots? Not decided on the call.</div>
+    </div>
+
+    <div class="card">
+      <h2>⚠️ Risks / Blockers <span class="count">3</span></h2>
+      <div class="list-item"><span class="badge b-high">🔴 Blocker</span>Course-upload API is blocked on a backend hosting issue (Render free tier).</div>
+      <div class="list-item"><span class="badge b-med">🟠 Risk</span>Exam week starts the 28th — team availability for testing phase expected to drop.</div>
+      <div class="list-item"><span class="badge b-med">🟠 Risk</span>Render free tier expired mid-sprint, causing a surprise ₹700 charge — recurring hosting cost risk going forward.</div>
+    </div>
+
+    <div class="card">
+      <h2>⚠️ Conflicts <span class="count">1</span></h2>
+      <div class="list-item"><span class="badge b-conflict">⚠️ Conflict</span>Database choice — Hari prefers MySQL (already built on it); Priya wants Firebase for real-time sync. Stated as unresolved on the call.</div>
+    </div>
+
+    <div class="card">
+      <h2>🗒️ Additional Notes</h2>
+      <details>
+        <summary>Parked ideas &amp; supporting context (2 items)</summary>
+        <div class="list-item">Gamification (badges/points) was discussed as an idea but explicitly parked for v2 — not part of the current sprint.</div>
+        <div class="list-item">The quiz module currently has no assigned owner — connected to the open question above, flagged here as supporting context.</div>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.getElementById('filterbar').addEventListener('click', function(e){
+  if(e.target.tagName!=='BUTTON') return;
+  this.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  const f = e.target.dataset.f;
+  document.querySelectorAll('#actionTable tbody tr').forEach(row=>{
+    let show = true;
+    if(f==='high') show = row.dataset.priority==='high';
+    if(f==='pending') show = row.dataset.status==='pending';
+    row.style.display = show ? '' : 'none';
+  });
+});
+</script>
