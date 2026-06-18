@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Cost Analysis Dashboard</title>
+<style>
+:root{
+  --bg:#0a0f1e;
+  --bg2:#0d1530;
+  --panel:rgba(255,255,255,0.045);
+  --panel-border:rgba(255,255,255,0.09);
+  --text:#e8edf7;
+  --text-dim:#8a96b3;
+  --text-faint:#5b6685;
+  --petrol:#3b82f6;
+  --diesel:#94a0b8;
+  --cng:#22c55e;
+  --e85:#f5a524;
+  --ev:#a855f7;
+  --good:#34d399;
+  --bad:#f87171;
+  --radius:18px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(circle at 12% 8%, rgba(245,165,36,0.10), transparent 38%),
+    radial-gradient(circle at 88% 0%, rgba(59,130,246,0.10), transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(168,85,247,0.08), transparent 45%),
+    var(--bg);
+  color:var(--text);
+  font-family:-apple-system,'Segoe UI',Roboto,'Inter',system-ui,sans-serif;
+  min-height:100vh;
+  padding:24px 18px 60px;
+}
+.eyebrow{
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--text-faint); font-weight:600; margin:0 0 6px;
+}
+.num{font-family:'SF Mono','Cascadia Mono','Roboto Mono',ui-monospace,monospace; font-variant-numeric: tabular-nums;}
+
+header{
+  max-width:1320px; margin:0 auto 26px; padding:22px 26px;
+  background:var(--panel); border:1px solid var(--panel-border);
+  border-radius:var(--radius); backdrop-filter:blur(14px);
+  display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:10px;
+}
+header h1{margin:0; font-size:22px; font-weight:700; letter-spacing:-0.01em;}
+header h1 .sep{color:var(--text-faint); margin:0 8px; font-weight:400;}
+header .tag{color:var(--e85); font-weight:700;}
+header .sub{color:var(--text-dim); font-size:13px;}
+
+main{max-width:1320px; margin:0 auto; display:flex; flex-direction:column; gap:20px;}
+
+.card{
+  background:var(--panel); border:1px solid var(--panel-border);
+  border-radius:var(--radius); backdrop-filter:blur(14px);
+  padding:20px 22px;
+}
+.card h3{margin:0 0 14px; font-size:14px; font-weight:700; color:var(--text); letter-spacing:.01em;}
+.card h3 small{display:block; font-size:11px; font-weight:500; color:var(--text-faint); text-transform:none; letter-spacing:0; margin-top:2px;}
+
+.kpi-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px;}
+.kpi{
+  background:var(--panel); border:1px solid var(--panel-border); border-radius:14px;
+  padding:16px 16px 14px; backdrop-filter:blur(14px); position:relative; overflow:hidden;
+}
+.kpi::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg, var(--accent,#3b82f6) 0%, transparent 55%);opacity:.10;}
+.kpi .label{font-size:11px; color:var(--text-dim); margin-bottom:8px; font-weight:600;}
+.kpi .value{font-size:25px; font-weight:700; line-height:1;}
+.kpi .delta{font-size:12px; margin-top:6px; font-weight:600;}
+.kpi .delta.pos{color:var(--bad);}
+.kpi .delta.neg{color:var(--good);}
+
+.charts-row{display:grid; grid-template-columns:1.4fr 1fr; gap:20px;}
+.chart-card svg{width:100%; height:auto; display:block; overflow:visible;}
+.legend{display:flex; gap:14px; flex-wrap:wrap; margin-top:12px; font-size:12px; color:var(--text-dim);}
+.legend span{display:inline-flex; align-items:center; gap:6px;}
+.legend i{width:9px; height:9px; border-radius:50%; display:inline-block;}
+
+.gauge-verdict-row{display:grid; grid-template-columns:0.85fr 2.15fr; gap:20px;}
+.gauge-card{display:flex; flex-direction:column; align-items:center; text-align:center;}
+.gauge-card svg{max-width:260px;}
+.gauge-score{font-size:30px; font-weight:700; margin-top:-46px;}
+.gauge-score span{font-size:14px; color:var(--text-dim); font-weight:500;}
+.verdict-card{display:flex; flex-direction:column; justify-content:center;}
+.verdict-card p{font-size:16px; line-height:1.55; color:var(--text); margin:0;}
+.verdict-card .tag-line{color:var(--text-faint); font-size:12px; margin-top:10px;}
+
+.fuel-cards-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px;}
+.fuel-card{
+  border-radius:16px; border:1px solid var(--panel-border); background:var(--panel);
+  backdrop-filter:blur(14px); padding:16px; position:relative; transition:transform .25s ease;
+}
+.fuel-card.active{
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 0 28px -4px var(--accent);
+}
+.fuel-card .ftitle{display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; margin-bottom:10px;}
+.fuel-card .dot{width:10px; height:10px; border-radius:50%; background:var(--accent);}
+.fuel-card.active .ftitle::after{content:"YOUR FUEL"; margin-left:auto; font-size:9px; letter-spacing:.08em; color:var(--accent); border:1px solid var(--accent); border-radius:20px; padding:2px 7px; font-weight:700;}
+.fuel-card ul{list-style:none; margin:0 0 8px; padding:0; font-size:12.5px; color:var(--text-dim); line-height:1.6;}
+.fuel-card .best{font-size:12px; color:var(--text); border-top:1px solid var(--panel-border); padding-top:8px; margin-top:6px;}
+
+.tooltip{
+  position:fixed; pointer-events:none; background:rgba(15,20,38,0.95); border:1px solid var(--panel-border);
+  border-radius:10px; padding:8px 11px; font-size:12px; color:var(--text); backdrop-filter:blur(10px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.4); opacity:0; transition:opacity .12s ease; z-index:50; white-space:nowrap;
+}
+.tooltip.show{opacity:1;}
+.tooltip b{color:inherit;}
+
+footer{max-width:1320px; margin:30px auto 0; color:var(--text-faint); font-size:11.5px; text-align:center;}
+
+@media (max-width:980px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .charts-row{grid-template-columns:1fr;}
+  .gauge-verdict-row{grid-template-columns:1fr;}
+  .fuel-cards-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:480px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .fuel-cards-grid{grid-template-columns:1fr;}
+  header{flex-direction:column; align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="headerTitle"></h1>
+  <div class="sub" id="headerSub"></div>
+</header>
+
+<main>
+  <section class="kpi-grid" id="kpiGrid"></section>
+
+  <section class="charts-row">
+    <div class="card chart-card">
+      <h3>Cost per km by fuel <small>Average ₹ spent per kilometre driven, across the dataset</small></h3>
+      <svg id="barChart" viewBox="0 0 560 300"></svg>
+      <div class="legend" id="barLegend"></div>
+    </div>
+    <div class="card chart-card">
+      <h3>CO₂ per km by fuel <small>Share of average emissions, kg CO₂/km</small></h3>
+      <svg id="doughnutChart" viewBox="0 0 240 240"></svg>
+      <div class="legend" id="doughnutLegend"></div>
+    </div>
+  </section>
+
+  <section class="card chart-card">
+    <h3>Cost/km vs vehicle age (0–12 years) <small>How running cost drifts as each fuel's vehicles age</small></h3>
+    <svg id="lineChart" viewBox="0 0 900 320"></svg>
+  </section>
+
+  <section class="gauge-verdict-row">
+    <div class="card gauge-card">
+      <h3>E85 Score</h3>
+      <svg id="gaugeSvg" viewBox="0 0 220 130"></svg>
+      <div class="gauge-score"><span id="gaugeNum">0.0</span><span>/10</span></div>
+    </div>
+    <div class="card verdict-card">
+      <h3>Verdict</h3>
+      <p id="verdictText"></p>
+      <div class="tag-line">Scoring weights — Cost 4pt · CO₂ 3pt · Refuel speed 2pt · Maintenance 1pt</div>
+    </div>
+  </section>
+
+  <section class="fuel-cards-grid" id="fuelCards"></section>
+</main>
+
+<footer>Day 17 · Vehicle Cost Analysis Dashboard — all figures computed client-side from the attached CSV dataset.</footer>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+/* ================= CONFIG (from "Details" block) ================= */
+const CONFIG = {
+  vehicle: "Maruti Suzuki Swift",
+  fuel: "Petrol",
+  usage: "Mixed",
+  kmPerMonth: 1000,
+  age: 3
+};
+
+/* ================= DATA (parsed from uploaded CSV) ================= */
+const DATA = [{"Vehicle_ID": "1", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 0, "Distance_km": 1469.0, "Fuel_Cost_INR": 8584.44, "CO2_emitted_kg": 194.41, "Maintenance_Cost_INR": 1058.43, "Refuel_Recharge_time_min": 5.1, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.45}, {"Vehicle_ID": "2", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 0, "Distance_km": 757.0, "Fuel_Cost_INR": 4239.08, "CO2_emitted_kg": 96.0, "Maintenance_Cost_INR": 590.94, "Refuel_Recharge_time_min": 6.0, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 18.21}, {"Vehicle_ID": "3", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 0, "Distance_km": 625.0, "Fuel_Cost_INR": 3438.18, "CO2_emitted_kg": 77.86, "Maintenance_Cost_INR": 445.21, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 18.54}, {"Vehicle_ID": "4", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 0, "Distance_km": 1259.0, "Fuel_Cost_INR": 7507.56, "CO2_emitted_kg": 170.02, "Maintenance_Cost_INR": 944.55, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.11}, {"Vehicle_ID": "5", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 1, "Distance_km": 2133.0, "Fuel_Cost_INR": 12207.78, "CO2_emitted_kg": 276.47, "Maintenance_Cost_INR": 1788.51, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.82}, {"Vehicle_ID": "6", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 1, "Distance_km": 1528.0, "Fuel_Cost_INR": 9449.25, "CO2_emitted_kg": 214.0, "Maintenance_Cost_INR": 1302.89, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.49}, {"Vehicle_ID": "7", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 1, "Distance_km": 709.0, "Fuel_Cost_INR": 3963.66, "CO2_emitted_kg": 89.77, "Maintenance_Cost_INR": 572.71, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 18.25}, {"Vehicle_ID": "8", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 1, "Distance_km": 1804.0, "Fuel_Cost_INR": 10946.69, "CO2_emitted_kg": 247.91, "Maintenance_Cost_INR": 1459.28, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.81}, {"Vehicle_ID": "9", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 2, "Distance_km": 1708.0, "Fuel_Cost_INR": 10682.59, "CO2_emitted_kg": 241.93, "Maintenance_Cost_INR": 1433.96, "Refuel_Recharge_time_min": 5.5, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.31}, {"Vehicle_ID": "10", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 2, "Distance_km": 2158.0, "Fuel_Cost_INR": 12825.75, "CO2_emitted_kg": 290.47, "Maintenance_Cost_INR": 2028.24, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.16}, {"Vehicle_ID": "11", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 2, "Distance_km": 2063.0, "Fuel_Cost_INR": 12360.47, "CO2_emitted_kg": 279.93, "Maintenance_Cost_INR": 1766.01, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.02}, {"Vehicle_ID": "12", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 2, "Distance_km": 1286.0, "Fuel_Cost_INR": 7740.04, "CO2_emitted_kg": 175.29, "Maintenance_Cost_INR": 1000.94, "Refuel_Recharge_time_min": 6.3, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.95}, {"Vehicle_ID": "13", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 3, "Distance_km": 1126.0, "Fuel_Cost_INR": 7147.62, "CO2_emitted_kg": 161.87, "Maintenance_Cost_INR": 1017.19, "Refuel_Recharge_time_min": 5.7, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.07}, {"Vehicle_ID": "14", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 3, "Distance_km": 410.0, "Fuel_Cost_INR": 2353.3, "CO2_emitted_kg": 53.3, "Maintenance_Cost_INR": 352.65, "Refuel_Recharge_time_min": 5.7, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.77}, {"Vehicle_ID": "15", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 3, "Distance_km": 909.0, "Fuel_Cost_INR": 5434.5, "CO2_emitted_kg": 123.08, "Maintenance_Cost_INR": 801.77, "Refuel_Recharge_time_min": 4.8, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.06}, {"Vehicle_ID": "16", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 3, "Distance_km": 2010.0, "Fuel_Cost_INR": 12397.3, "CO2_emitted_kg": 280.76, "Maintenance_Cost_INR": 1914.38, "Refuel_Recharge_time_min": 6.5, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.54}, {"Vehicle_ID": "17", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 4, "Distance_km": 1491.0, "Fuel_Cost_INR": 8997.2, "CO2_emitted_kg": 203.76, "Maintenance_Cost_INR": 1325.29, "Refuel_Recharge_time_min": 6.0, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.9}, {"Vehicle_ID": "18", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 4, "Distance_km": 1112.0, "Fuel_Cost_INR": 6907.32, "CO2_emitted_kg": 156.43, "Maintenance_Cost_INR": 1031.67, "Refuel_Recharge_time_min": 6.7, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.42}, {"Vehicle_ID": "19", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 4, "Distance_km": 1584.0, "Fuel_Cost_INR": 9299.42, "CO2_emitted_kg": 210.6, "Maintenance_Cost_INR": 1470.49, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.37}, {"Vehicle_ID": "20", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 4, "Distance_km": 1112.0, "Fuel_Cost_INR": 7176.63, "CO2_emitted_kg": 162.53, "Maintenance_Cost_INR": 1119.75, "Refuel_Recharge_time_min": 5.4, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.8}, {"Vehicle_ID": "21", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 5, "Distance_km": 510.0, "Fuel_Cost_INR": 3051.65, "CO2_emitted_kg": 69.11, "Maintenance_Cost_INR": 496.73, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.05}, {"Vehicle_ID": "22", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 5, "Distance_km": 1864.0, "Fuel_Cost_INR": 10918.02, "CO2_emitted_kg": 247.26, "Maintenance_Cost_INR": 1706.37, "Refuel_Recharge_time_min": 5.7, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.41}, {"Vehicle_ID": "23", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 5, "Distance_km": 1804.0, "Fuel_Cost_INR": 11611.25, "CO2_emitted_kg": 262.96, "Maintenance_Cost_INR": 1821.03, "Refuel_Recharge_time_min": 6.9, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.85}, {"Vehicle_ID": "24", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 5, "Distance_km": 1608.0, "Fuel_Cost_INR": 9522.46, "CO2_emitted_kg": 215.66, "Maintenance_Cost_INR": 1524.97, "Refuel_Recharge_time_min": 7.0, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 17.22}, {"Vehicle_ID": "25", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 6, "Distance_km": 708.0, "Fuel_Cost_INR": 4318.28, "CO2_emitted_kg": 97.8, "Maintenance_Cost_INR": 815.45, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.72}, {"Vehicle_ID": "26", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 6, "Distance_km": 1499.0, "Fuel_Cost_INR": 9568.51, "CO2_emitted_kg": 216.7, "Maintenance_Cost_INR": 1720.87, "Refuel_Recharge_time_min": 4.9, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.98}, {"Vehicle_ID": "27", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 6, "Distance_km": 1047.0, "Fuel_Cost_INR": 6904.73, "CO2_emitted_kg": 156.37, "Maintenance_Cost_INR": 1210.05, "Refuel_Recharge_time_min": 4.3, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.47}, {"Vehicle_ID": "28", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 6, "Distance_km": 1978.0, "Fuel_Cost_INR": 12615.47, "CO2_emitted_kg": 285.7, "Maintenance_Cost_INR": 2001.47, "Refuel_Recharge_time_min": 7.0, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.99}, {"Vehicle_ID": "29", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 7, "Distance_km": 1383.0, "Fuel_Cost_INR": 9209.53, "CO2_emitted_kg": 208.57, "Maintenance_Cost_INR": 1417.27, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.32}, {"Vehicle_ID": "30", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 7, "Distance_km": 895.0, "Fuel_Cost_INR": 5846.67, "CO2_emitted_kg": 132.41, "Maintenance_Cost_INR": 1091.76, "Refuel_Recharge_time_min": 5.7, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.61}, {"Vehicle_ID": "31", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 7, "Distance_km": 2041.0, "Fuel_Cost_INR": 13215.3, "CO2_emitted_kg": 299.29, "Maintenance_Cost_INR": 2383.39, "Refuel_Recharge_time_min": 5.5, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.75}, {"Vehicle_ID": "32", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 7, "Distance_km": 1204.0, "Fuel_Cost_INR": 7309.92, "CO2_emitted_kg": 165.55, "Maintenance_Cost_INR": 1270.79, "Refuel_Recharge_time_min": 5.2, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.8}, {"Vehicle_ID": "33", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 8, "Distance_km": 1683.0, "Fuel_Cost_INR": 10837.99, "CO2_emitted_kg": 245.45, "Maintenance_Cost_INR": 2153.18, "Refuel_Recharge_time_min": 6.3, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.84}, {"Vehicle_ID": "34", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 8, "Distance_km": 869.0, "Fuel_Cost_INR": 5570.07, "CO2_emitted_kg": 126.15, "Maintenance_Cost_INR": 1081.72, "Refuel_Recharge_time_min": 6.9, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.91}, {"Vehicle_ID": "35", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 8, "Distance_km": 1625.0, "Fuel_Cost_INR": 11031.14, "CO2_emitted_kg": 249.82, "Maintenance_Cost_INR": 1994.22, "Refuel_Recharge_time_min": 5.7, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.03}, {"Vehicle_ID": "36", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 8, "Distance_km": 1265.0, "Fuel_Cost_INR": 8559.16, "CO2_emitted_kg": 193.84, "Maintenance_Cost_INR": 1578.41, "Refuel_Recharge_time_min": 6.9, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.08}, {"Vehicle_ID": "37", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 9, "Distance_km": 746.0, "Fuel_Cost_INR": 4594.12, "CO2_emitted_kg": 104.04, "Maintenance_Cost_INR": 922.17, "Refuel_Recharge_time_min": 5.8, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.56}, {"Vehicle_ID": "38", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 9, "Distance_km": 1153.0, "Fuel_Cost_INR": 7786.81, "CO2_emitted_kg": 176.35, "Maintenance_Cost_INR": 1542.76, "Refuel_Recharge_time_min": 4.6, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.1}, {"Vehicle_ID": "39", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 9, "Distance_km": 1288.0, "Fuel_Cost_INR": 8499.73, "CO2_emitted_kg": 192.49, "Maintenance_Cost_INR": 1603.4, "Refuel_Recharge_time_min": 5.6, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.46}, {"Vehicle_ID": "40", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 9, "Distance_km": 1471.0, "Fuel_Cost_INR": 10143.62, "CO2_emitted_kg": 229.72, "Maintenance_Cost_INR": 1957.34, "Refuel_Recharge_time_min": 6.7, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 14.79}, {"Vehicle_ID": "41", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 10, "Distance_km": 1533.0, "Fuel_Cost_INR": 9756.47, "CO2_emitted_kg": 220.96, "Maintenance_Cost_INR": 1934.79, "Refuel_Recharge_time_min": 5.3, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 16.03}, {"Vehicle_ID": "42", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 10, "Distance_km": 1432.0, "Fuel_Cost_INR": 9846.89, "CO2_emitted_kg": 223.0, "Maintenance_Cost_INR": 1843.83, "Refuel_Recharge_time_min": 5.4, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 14.83}, {"Vehicle_ID": "43", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 10, "Distance_km": 1002.0, "Fuel_Cost_INR": 6780.37, "CO2_emitted_kg": 153.56, "Maintenance_Cost_INR": 1402.19, "Refuel_Recharge_time_min": 6.5, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.07}, {"Vehicle_ID": "44", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 10, "Distance_km": 1357.0, "Fuel_Cost_INR": 9097.79, "CO2_emitted_kg": 206.04, "Maintenance_Cost_INR": 1670.92, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.21}, {"Vehicle_ID": "45", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 11, "Distance_km": 601.0, "Fuel_Cost_INR": 3995.03, "CO2_emitted_kg": 90.48, "Maintenance_Cost_INR": 829.63, "Refuel_Recharge_time_min": 4.1, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.34}, {"Vehicle_ID": "46", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 11, "Distance_km": 1366.0, "Fuel_Cost_INR": 8871.44, "CO2_emitted_kg": 200.91, "Maintenance_Cost_INR": 1741.34, "Refuel_Recharge_time_min": 4.6, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.71}, {"Vehicle_ID": "47", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 11, "Distance_km": 1997.0, "Fuel_Cost_INR": 13990.83, "CO2_emitted_kg": 316.85, "Maintenance_Cost_INR": 2867.66, "Refuel_Recharge_time_min": 6.5, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 14.56}, {"Vehicle_ID": "48", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 11, "Distance_km": 453.0, "Fuel_Cost_INR": 3034.31, "CO2_emitted_kg": 68.72, "Maintenance_Cost_INR": 640.0, "Refuel_Recharge_time_min": 6.8, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.23}, {"Vehicle_ID": "49", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 12, "Distance_km": 2176.0, "Fuel_Cost_INR": 14435.06, "CO2_emitted_kg": 326.91, "Maintenance_Cost_INR": 3213.38, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.38}, {"Vehicle_ID": "50", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 12, "Distance_km": 1276.0, "Fuel_Cost_INR": 8163.56, "CO2_emitted_kg": 184.88, "Maintenance_Cost_INR": 1844.82, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.94}, {"Vehicle_ID": "51", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 12, "Distance_km": 1503.0, "Fuel_Cost_INR": 10457.14, "CO2_emitted_kg": 236.82, "Maintenance_Cost_INR": 2014.78, "Refuel_Recharge_time_min": 6.8, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 14.66}, {"Vehicle_ID": "52", "Fuel_Type": "Petrol", "Vehicle_Age_yrs": 12, "Distance_km": 1590.0, "Fuel_Cost_INR": 10336.03, "CO2_emitted_kg": 234.08, "Maintenance_Cost_INR": 2402.79, "Refuel_Recharge_time_min": 5.2, "Fuel_Price_INR_per_unit": 102.0, "Mileage_km_per_unit": 15.69}, {"Vehicle_ID": "53", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 0, "Distance_km": 415.0, "Fuel_Cost_INR": 1765.3, "CO2_emitted_kg": 51.42, "Maintenance_Cost_INR": 433.25, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 21.63}, {"Vehicle_ID": "54", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 0, "Distance_km": 1934.0, "Fuel_Cost_INR": 7931.63, "CO2_emitted_kg": 231.05, "Maintenance_Cost_INR": 1665.89, "Refuel_Recharge_time_min": 6.2, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 22.43}, {"Vehicle_ID": "55", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 0, "Distance_km": 983.0, "Fuel_Cost_INR": 4286.27, "CO2_emitted_kg": 124.86, "Maintenance_Cost_INR": 862.4, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 21.1}, {"Vehicle_ID": "56", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 0, "Distance_km": 2114.0, "Fuel_Cost_INR": 9313.58, "CO2_emitted_kg": 271.31, "Maintenance_Cost_INR": 2006.08, "Refuel_Recharge_time_min": 4.8, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.88}, {"Vehicle_ID": "57", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 1, "Distance_km": 655.0, "Fuel_Cost_INR": 2916.45, "CO2_emitted_kg": 84.96, "Maintenance_Cost_INR": 609.04, "Refuel_Recharge_time_min": 5.3, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.66}, {"Vehicle_ID": "58", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 1, "Distance_km": 1802.0, "Fuel_Cost_INR": 8079.31, "CO2_emitted_kg": 235.35, "Maintenance_Cost_INR": 1782.49, "Refuel_Recharge_time_min": 4.6, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.52}, {"Vehicle_ID": "59", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 1, "Distance_km": 2012.0, "Fuel_Cost_INR": 8613.83, "CO2_emitted_kg": 250.92, "Maintenance_Cost_INR": 2161.64, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 21.49}, {"Vehicle_ID": "60", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 1, "Distance_km": 1296.0, "Fuel_Cost_INR": 5578.23, "CO2_emitted_kg": 162.5, "Maintenance_Cost_INR": 1287.99, "Refuel_Recharge_time_min": 5.6, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 21.37}, {"Vehicle_ID": "61", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 2, "Distance_km": 1956.0, "Fuel_Cost_INR": 8152.48, "CO2_emitted_kg": 237.49, "Maintenance_Cost_INR": 2187.51, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 22.07}, {"Vehicle_ID": "62", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 2, "Distance_km": 1601.0, "Fuel_Cost_INR": 6970.02, "CO2_emitted_kg": 203.04, "Maintenance_Cost_INR": 1670.46, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 21.13}, {"Vehicle_ID": "63", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 2, "Distance_km": 976.0, "Fuel_Cost_INR": 4041.17, "CO2_emitted_kg": 117.72, "Maintenance_Cost_INR": 1037.38, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 22.22}, {"Vehicle_ID": "64", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 2, "Distance_km": 745.0, "Fuel_Cost_INR": 3104.32, "CO2_emitted_kg": 90.43, "Maintenance_Cost_INR": 750.51, "Refuel_Recharge_time_min": 4.7, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 22.08}, {"Vehicle_ID": "65", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 3, "Distance_km": 1520.0, "Fuel_Cost_INR": 6878.49, "CO2_emitted_kg": 200.37, "Maintenance_Cost_INR": 1837.42, "Refuel_Recharge_time_min": 6.3, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.33}, {"Vehicle_ID": "66", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 3, "Distance_km": 2036.0, "Fuel_Cost_INR": 9441.89, "CO2_emitted_kg": 275.05, "Maintenance_Cost_INR": 2545.71, "Refuel_Recharge_time_min": 5.5, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.84}, {"Vehicle_ID": "67", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 3, "Distance_km": 1428.0, "Fuel_Cost_INR": 6569.62, "CO2_emitted_kg": 191.38, "Maintenance_Cost_INR": 1479.64, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.0}, {"Vehicle_ID": "68", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 3, "Distance_km": 1409.0, "Fuel_Cost_INR": 6577.78, "CO2_emitted_kg": 191.61, "Maintenance_Cost_INR": 1485.73, "Refuel_Recharge_time_min": 5.5, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.71}, {"Vehicle_ID": "69", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 4, "Distance_km": 899.0, "Fuel_Cost_INR": 4199.11, "CO2_emitted_kg": 122.32, "Maintenance_Cost_INR": 1187.39, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.7}, {"Vehicle_ID": "70", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 4, "Distance_km": 1095.0, "Fuel_Cost_INR": 4675.17, "CO2_emitted_kg": 136.19, "Maintenance_Cost_INR": 1321.55, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 21.55}, {"Vehicle_ID": "71", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 4, "Distance_km": 706.0, "Fuel_Cost_INR": 3072.89, "CO2_emitted_kg": 89.51, "Maintenance_Cost_INR": 825.58, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 21.14}, {"Vehicle_ID": "72", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 4, "Distance_km": 1577.0, "Fuel_Cost_INR": 7056.51, "CO2_emitted_kg": 205.56, "Maintenance_Cost_INR": 1780.92, "Refuel_Recharge_time_min": 4.3, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.56}, {"Vehicle_ID": "73", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 5, "Distance_km": 2075.0, "Fuel_Cost_INR": 9134.43, "CO2_emitted_kg": 266.09, "Maintenance_Cost_INR": 2918.71, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.9}, {"Vehicle_ID": "74", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 5, "Distance_km": 2025.0, "Fuel_Cost_INR": 9473.93, "CO2_emitted_kg": 275.98, "Maintenance_Cost_INR": 2449.92, "Refuel_Recharge_time_min": 5.6, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.66}, {"Vehicle_ID": "75", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 5, "Distance_km": 1156.0, "Fuel_Cost_INR": 5038.4, "CO2_emitted_kg": 146.77, "Maintenance_Cost_INR": 1463.64, "Refuel_Recharge_time_min": 4.8, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 21.11}, {"Vehicle_ID": "76", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 5, "Distance_km": 561.0, "Fuel_Cost_INR": 2608.09, "CO2_emitted_kg": 75.97, "Maintenance_Cost_INR": 787.3, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.79}, {"Vehicle_ID": "77", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 6, "Distance_km": 1046.0, "Fuel_Cost_INR": 5115.48, "CO2_emitted_kg": 149.02, "Maintenance_Cost_INR": 1515.18, "Refuel_Recharge_time_min": 5.7, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 18.81}, {"Vehicle_ID": "78", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 6, "Distance_km": 1120.0, "Fuel_Cost_INR": 5042.04, "CO2_emitted_kg": 146.88, "Maintenance_Cost_INR": 1508.47, "Refuel_Recharge_time_min": 5.3, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.44}, {"Vehicle_ID": "79", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 6, "Distance_km": 931.0, "Fuel_Cost_INR": 4183.96, "CO2_emitted_kg": 121.88, "Maintenance_Cost_INR": 1243.19, "Refuel_Recharge_time_min": 6.3, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.47}, {"Vehicle_ID": "80", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 6, "Distance_km": 732.0, "Fuel_Cost_INR": 3265.16, "CO2_emitted_kg": 95.12, "Maintenance_Cost_INR": 930.78, "Refuel_Recharge_time_min": 4.6, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.63}, {"Vehicle_ID": "81", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 7, "Distance_km": 1142.0, "Fuel_Cost_INR": 5169.85, "CO2_emitted_kg": 150.6, "Maintenance_Cost_INR": 1683.49, "Refuel_Recharge_time_min": 4.6, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.32}, {"Vehicle_ID": "82", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 7, "Distance_km": 1965.0, "Fuel_Cost_INR": 9006.76, "CO2_emitted_kg": 262.37, "Maintenance_Cost_INR": 2714.56, "Refuel_Recharge_time_min": 5.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.07}, {"Vehicle_ID": "83", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 7, "Distance_km": 804.0, "Fuel_Cost_INR": 3813.1, "CO2_emitted_kg": 111.08, "Maintenance_Cost_INR": 1138.2, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.4}, {"Vehicle_ID": "84", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 7, "Distance_km": 1596.0, "Fuel_Cost_INR": 7449.35, "CO2_emitted_kg": 217.0, "Maintenance_Cost_INR": 2232.8, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.71}, {"Vehicle_ID": "85", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 8, "Distance_km": 668.0, "Fuel_Cost_INR": 3258.64, "CO2_emitted_kg": 94.93, "Maintenance_Cost_INR": 977.3, "Refuel_Recharge_time_min": 5.2, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 18.86}, {"Vehicle_ID": "86", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 8, "Distance_km": 1803.0, "Fuel_Cost_INR": 8614.26, "CO2_emitted_kg": 250.94, "Maintenance_Cost_INR": 2664.58, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.26}, {"Vehicle_ID": "87", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 8, "Distance_km": 1818.0, "Fuel_Cost_INR": 8282.88, "CO2_emitted_kg": 241.28, "Maintenance_Cost_INR": 2600.89, "Refuel_Recharge_time_min": 5.2, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.19}, {"Vehicle_ID": "88", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 8, "Distance_km": 838.0, "Fuel_Cost_INR": 3789.59, "CO2_emitted_kg": 110.39, "Maintenance_Cost_INR": 1240.1, "Refuel_Recharge_time_min": 5.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.34}, {"Vehicle_ID": "89", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 9, "Distance_km": 1232.0, "Fuel_Cost_INR": 5636.12, "CO2_emitted_kg": 164.18, "Maintenance_Cost_INR": 1965.15, "Refuel_Recharge_time_min": 4.3, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 20.11}, {"Vehicle_ID": "90", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 9, "Distance_km": 776.0, "Fuel_Cost_INR": 3713.74, "CO2_emitted_kg": 108.18, "Maintenance_Cost_INR": 1145.06, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.22}, {"Vehicle_ID": "91", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 9, "Distance_km": 721.0, "Fuel_Cost_INR": 3555.1, "CO2_emitted_kg": 103.56, "Maintenance_Cost_INR": 1012.86, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 18.66}, {"Vehicle_ID": "92", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 9, "Distance_km": 1303.0, "Fuel_Cost_INR": 6593.35, "CO2_emitted_kg": 192.07, "Maintenance_Cost_INR": 2178.73, "Refuel_Recharge_time_min": 6.5, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 18.18}, {"Vehicle_ID": "93", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 10, "Distance_km": 1723.0, "Fuel_Cost_INR": 8607.93, "CO2_emitted_kg": 250.75, "Maintenance_Cost_INR": 2677.67, "Refuel_Recharge_time_min": 5.1, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 18.42}, {"Vehicle_ID": "94", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 10, "Distance_km": 939.0, "Fuel_Cost_INR": 4387.13, "CO2_emitted_kg": 127.8, "Maintenance_Cost_INR": 1375.1, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.69}, {"Vehicle_ID": "95", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 10, "Distance_km": 1852.0, "Fuel_Cost_INR": 8940.51, "CO2_emitted_kg": 260.44, "Maintenance_Cost_INR": 3011.76, "Refuel_Recharge_time_min": 6.8, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.06}, {"Vehicle_ID": "96", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 10, "Distance_km": 1841.0, "Fuel_Cost_INR": 9440.86, "CO2_emitted_kg": 275.02, "Maintenance_Cost_INR": 2851.05, "Refuel_Recharge_time_min": 5.1, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 17.94}, {"Vehicle_ID": "97", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 11, "Distance_km": 1386.0, "Fuel_Cost_INR": 6456.79, "CO2_emitted_kg": 188.09, "Maintenance_Cost_INR": 2455.25, "Refuel_Recharge_time_min": 4.3, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.75}, {"Vehicle_ID": "98", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 11, "Distance_km": 1161.0, "Fuel_Cost_INR": 5798.29, "CO2_emitted_kg": 168.91, "Maintenance_Cost_INR": 1931.31, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 18.42}, {"Vehicle_ID": "99", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 11, "Distance_km": 1409.0, "Fuel_Cost_INR": 7041.53, "CO2_emitted_kg": 205.12, "Maintenance_Cost_INR": 2236.42, "Refuel_Recharge_time_min": 5.8, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 18.41}, {"Vehicle_ID": "100", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 11, "Distance_km": 2029.0, "Fuel_Cost_INR": 10470.15, "CO2_emitted_kg": 305.0, "Maintenance_Cost_INR": 3424.44, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 17.83}, {"Vehicle_ID": "101", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 12, "Distance_km": 1182.0, "Fuel_Cost_INR": 6183.65, "CO2_emitted_kg": 180.13, "Maintenance_Cost_INR": 2090.12, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 17.59}, {"Vehicle_ID": "102", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 12, "Distance_km": 1861.0, "Fuel_Cost_INR": 9401.73, "CO2_emitted_kg": 273.88, "Maintenance_Cost_INR": 2998.97, "Refuel_Recharge_time_min": 6.2, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 18.21}, {"Vehicle_ID": "103", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 12, "Distance_km": 694.0, "Fuel_Cost_INR": 3397.47, "CO2_emitted_kg": 98.97, "Maintenance_Cost_INR": 1224.67, "Refuel_Recharge_time_min": 5.3, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 18.79}, {"Vehicle_ID": "104", "Fuel_Type": "Diesel", "Vehicle_Age_yrs": 12, "Distance_km": 1789.0, "Fuel_Cost_INR": 8516.36, "CO2_emitted_kg": 248.09, "Maintenance_Cost_INR": 2982.2, "Refuel_Recharge_time_min": 7.0, "Fuel_Price_INR_per_unit": 92.0, "Mileage_km_per_unit": 19.33}, {"Vehicle_ID": "105", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 0, "Distance_km": 617.0, "Fuel_Cost_INR": 1979.89, "CO2_emitted_kg": 50.77, "Maintenance_Cost_INR": 372.21, "Refuel_Recharge_time_min": 6.9, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 24.31}, {"Vehicle_ID": "106", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 0, "Distance_km": 2017.0, "Fuel_Cost_INR": 6573.07, "CO2_emitted_kg": 168.54, "Maintenance_Cost_INR": 1259.34, "Refuel_Recharge_time_min": 7.3, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.93}, {"Vehicle_ID": "107", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 0, "Distance_km": 434.0, "Fuel_Cost_INR": 1450.4, "CO2_emitted_kg": 37.19, "Maintenance_Cost_INR": 275.54, "Refuel_Recharge_time_min": 8.5, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.34}, {"Vehicle_ID": "108", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 0, "Distance_km": 612.0, "Fuel_Cost_INR": 1940.26, "CO2_emitted_kg": 49.75, "Maintenance_Cost_INR": 400.73, "Refuel_Recharge_time_min": 7.3, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 24.6}, {"Vehicle_ID": "109", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 1, "Distance_km": 1340.0, "Fuel_Cost_INR": 4274.69, "CO2_emitted_kg": 109.61, "Maintenance_Cost_INR": 849.43, "Refuel_Recharge_time_min": 7.9, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 24.45}, {"Vehicle_ID": "110", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 1, "Distance_km": 1494.0, "Fuel_Cost_INR": 4926.41, "CO2_emitted_kg": 126.32, "Maintenance_Cost_INR": 996.87, "Refuel_Recharge_time_min": 9.7, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.65}, {"Vehicle_ID": "111", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 1, "Distance_km": 1884.0, "Fuel_Cost_INR": 6051.87, "CO2_emitted_kg": 155.18, "Maintenance_Cost_INR": 1397.07, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 24.28}, {"Vehicle_ID": "112", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 1, "Distance_km": 545.0, "Fuel_Cost_INR": 1790.49, "CO2_emitted_kg": 45.91, "Maintenance_Cost_INR": 392.7, "Refuel_Recharge_time_min": 9.4, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.74}, {"Vehicle_ID": "113", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 2, "Distance_km": 2124.0, "Fuel_Cost_INR": 6857.91, "CO2_emitted_kg": 175.84, "Maintenance_Cost_INR": 1596.58, "Refuel_Recharge_time_min": 6.8, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 24.16}, {"Vehicle_ID": "114", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 2, "Distance_km": 1004.0, "Fuel_Cost_INR": 3310.72, "CO2_emitted_kg": 84.89, "Maintenance_Cost_INR": 787.76, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.65}, {"Vehicle_ID": "115", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 2, "Distance_km": 1967.0, "Fuel_Cost_INR": 6782.38, "CO2_emitted_kg": 173.91, "Maintenance_Cost_INR": 1328.23, "Refuel_Recharge_time_min": 8.1, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.62}, {"Vehicle_ID": "116", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 2, "Distance_km": 1247.0, "Fuel_Cost_INR": 4088.05, "CO2_emitted_kg": 104.82, "Maintenance_Cost_INR": 956.33, "Refuel_Recharge_time_min": 8.3, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.79}, {"Vehicle_ID": "117", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 3, "Distance_km": 1552.0, "Fuel_Cost_INR": 5338.09, "CO2_emitted_kg": 136.87, "Maintenance_Cost_INR": 1197.4, "Refuel_Recharge_time_min": 6.5, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.68}, {"Vehicle_ID": "118", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 3, "Distance_km": 1906.0, "Fuel_Cost_INR": 6788.04, "CO2_emitted_kg": 174.05, "Maintenance_Cost_INR": 1448.52, "Refuel_Recharge_time_min": 6.9, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 21.9}, {"Vehicle_ID": "119", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 3, "Distance_km": 1050.0, "Fuel_Cost_INR": 3625.1, "CO2_emitted_kg": 92.95, "Maintenance_Cost_INR": 873.79, "Refuel_Recharge_time_min": 6.8, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.59}, {"Vehicle_ID": "120", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 3, "Distance_km": 602.0, "Fuel_Cost_INR": 1989.42, "CO2_emitted_kg": 51.01, "Maintenance_Cost_INR": 497.33, "Refuel_Recharge_time_min": 7.9, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.6}, {"Vehicle_ID": "121", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 4, "Distance_km": 1300.0, "Fuel_Cost_INR": 4564.51, "CO2_emitted_kg": 117.04, "Maintenance_Cost_INR": 1149.21, "Refuel_Recharge_time_min": 8.5, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.21}, {"Vehicle_ID": "122", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 4, "Distance_km": 807.0, "Fuel_Cost_INR": 2661.15, "CO2_emitted_kg": 68.23, "Maintenance_Cost_INR": 637.76, "Refuel_Recharge_time_min": 7.0, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.65}, {"Vehicle_ID": "123", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 4, "Distance_km": 935.0, "Fuel_Cost_INR": 3116.51, "CO2_emitted_kg": 79.91, "Maintenance_Cost_INR": 756.41, "Refuel_Recharge_time_min": 7.7, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.4}, {"Vehicle_ID": "124", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 4, "Distance_km": 1846.0, "Fuel_Cost_INR": 6809.3, "CO2_emitted_kg": 174.6, "Maintenance_Cost_INR": 1554.19, "Refuel_Recharge_time_min": 9.8, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 21.15}, {"Vehicle_ID": "125", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 5, "Distance_km": 431.0, "Fuel_Cost_INR": 1614.75, "CO2_emitted_kg": 41.4, "Maintenance_Cost_INR": 381.33, "Refuel_Recharge_time_min": 9.0, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.82}, {"Vehicle_ID": "126", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 5, "Distance_km": 1834.0, "Fuel_Cost_INR": 6398.39, "CO2_emitted_kg": 164.06, "Maintenance_Cost_INR": 1709.47, "Refuel_Recharge_time_min": 8.7, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.36}, {"Vehicle_ID": "127", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 5, "Distance_km": 753.0, "Fuel_Cost_INR": 2508.2, "CO2_emitted_kg": 64.31, "Maintenance_Cost_INR": 642.04, "Refuel_Recharge_time_min": 8.4, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 23.42}, {"Vehicle_ID": "128", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 5, "Distance_km": 1049.0, "Fuel_Cost_INR": 3656.59, "CO2_emitted_kg": 93.76, "Maintenance_Cost_INR": 980.46, "Refuel_Recharge_time_min": 8.3, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.38}, {"Vehicle_ID": "129", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 6, "Distance_km": 1314.0, "Fuel_Cost_INR": 4930.84, "CO2_emitted_kg": 126.43, "Maintenance_Cost_INR": 1097.33, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.79}, {"Vehicle_ID": "130", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 6, "Distance_km": 1439.0, "Fuel_Cost_INR": 5370.61, "CO2_emitted_kg": 137.71, "Maintenance_Cost_INR": 1313.55, "Refuel_Recharge_time_min": 8.3, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.9}, {"Vehicle_ID": "131", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 6, "Distance_km": 415.0, "Fuel_Cost_INR": 1544.89, "CO2_emitted_kg": 39.61, "Maintenance_Cost_INR": 373.51, "Refuel_Recharge_time_min": 8.8, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.95}, {"Vehicle_ID": "132", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 6, "Distance_km": 603.0, "Fuel_Cost_INR": 2214.6, "CO2_emitted_kg": 56.78, "Maintenance_Cost_INR": 523.47, "Refuel_Recharge_time_min": 8.9, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 21.24}, {"Vehicle_ID": "133", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 7, "Distance_km": 1642.0, "Fuel_Cost_INR": 5641.26, "CO2_emitted_kg": 144.65, "Maintenance_Cost_INR": 1580.05, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.7}, {"Vehicle_ID": "134", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 7, "Distance_km": 852.0, "Fuel_Cost_INR": 2919.43, "CO2_emitted_kg": 74.86, "Maintenance_Cost_INR": 858.14, "Refuel_Recharge_time_min": 7.0, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.76}, {"Vehicle_ID": "135", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 7, "Distance_km": 1892.0, "Fuel_Cost_INR": 6533.39, "CO2_emitted_kg": 167.52, "Maintenance_Cost_INR": 1821.19, "Refuel_Recharge_time_min": 6.7, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.59}, {"Vehicle_ID": "136", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 7, "Distance_km": 907.0, "Fuel_Cost_INR": 3284.46, "CO2_emitted_kg": 84.22, "Maintenance_Cost_INR": 845.29, "Refuel_Recharge_time_min": 7.0, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 21.54}, {"Vehicle_ID": "137", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 8, "Distance_km": 1881.0, "Fuel_Cost_INR": 6833.04, "CO2_emitted_kg": 175.21, "Maintenance_Cost_INR": 1839.89, "Refuel_Recharge_time_min": 7.0, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 21.47}, {"Vehicle_ID": "138", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 8, "Distance_km": 1200.0, "Fuel_Cost_INR": 4684.44, "CO2_emitted_kg": 120.11, "Maintenance_Cost_INR": 1290.82, "Refuel_Recharge_time_min": 7.1, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 19.98}, {"Vehicle_ID": "139", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 8, "Distance_km": 731.0, "Fuel_Cost_INR": 2540.41, "CO2_emitted_kg": 65.14, "Maintenance_Cost_INR": 698.58, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.44}, {"Vehicle_ID": "140", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 8, "Distance_km": 1132.0, "Fuel_Cost_INR": 4358.92, "CO2_emitted_kg": 111.77, "Maintenance_Cost_INR": 1042.31, "Refuel_Recharge_time_min": 7.4, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.26}, {"Vehicle_ID": "141", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 9, "Distance_km": 1068.0, "Fuel_Cost_INR": 4107.81, "CO2_emitted_kg": 105.33, "Maintenance_Cost_INR": 1132.94, "Refuel_Recharge_time_min": 6.7, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.28}, {"Vehicle_ID": "142", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 9, "Distance_km": 1579.0, "Fuel_Cost_INR": 5545.4, "CO2_emitted_kg": 142.19, "Maintenance_Cost_INR": 1712.64, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 22.21}, {"Vehicle_ID": "143", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 9, "Distance_km": 2145.0, "Fuel_Cost_INR": 8459.17, "CO2_emitted_kg": 216.9, "Maintenance_Cost_INR": 2392.61, "Refuel_Recharge_time_min": 8.6, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 19.78}, {"Vehicle_ID": "144", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 9, "Distance_km": 1241.0, "Fuel_Cost_INR": 4662.41, "CO2_emitted_kg": 119.55, "Maintenance_Cost_INR": 1320.01, "Refuel_Recharge_time_min": 7.9, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.76}, {"Vehicle_ID": "145", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 10, "Distance_km": 2126.0, "Fuel_Cost_INR": 7550.23, "CO2_emitted_kg": 193.6, "Maintenance_Cost_INR": 2126.75, "Refuel_Recharge_time_min": 6.3, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 21.96}, {"Vehicle_ID": "146", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 10, "Distance_km": 743.0, "Fuel_Cost_INR": 2876.06, "CO2_emitted_kg": 73.75, "Maintenance_Cost_INR": 834.16, "Refuel_Recharge_time_min": 7.5, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.15}, {"Vehicle_ID": "147", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 10, "Distance_km": 469.0, "Fuel_Cost_INR": 1845.27, "CO2_emitted_kg": 47.31, "Maintenance_Cost_INR": 496.09, "Refuel_Recharge_time_min": 9.2, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 19.82}, {"Vehicle_ID": "148", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 10, "Distance_km": 2110.0, "Fuel_Cost_INR": 7721.41, "CO2_emitted_kg": 197.98, "Maintenance_Cost_INR": 2524.61, "Refuel_Recharge_time_min": 9.4, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 21.31}, {"Vehicle_ID": "149", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 11, "Distance_km": 1054.0, "Fuel_Cost_INR": 4032.51, "CO2_emitted_kg": 103.4, "Maintenance_Cost_INR": 1228.08, "Refuel_Recharge_time_min": 9.8, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.39}, {"Vehicle_ID": "150", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 11, "Distance_km": 1000.0, "Fuel_Cost_INR": 3752.11, "CO2_emitted_kg": 96.21, "Maintenance_Cost_INR": 1179.27, "Refuel_Recharge_time_min": 8.8, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.79}, {"Vehicle_ID": "151", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 11, "Distance_km": 842.0, "Fuel_Cost_INR": 3352.92, "CO2_emitted_kg": 85.97, "Maintenance_Cost_INR": 987.93, "Refuel_Recharge_time_min": 9.6, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 19.59}, {"Vehicle_ID": "152", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 11, "Distance_km": 1034.0, "Fuel_Cost_INR": 3967.82, "CO2_emitted_kg": 101.74, "Maintenance_Cost_INR": 1144.47, "Refuel_Recharge_time_min": 6.2, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.33}, {"Vehicle_ID": "153", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 12, "Distance_km": 1974.0, "Fuel_Cost_INR": 7387.95, "CO2_emitted_kg": 189.43, "Maintenance_Cost_INR": 2477.81, "Refuel_Recharge_time_min": 6.5, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.84}, {"Vehicle_ID": "154", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 12, "Distance_km": 1069.0, "Fuel_Cost_INR": 4390.24, "CO2_emitted_kg": 112.57, "Maintenance_Cost_INR": 1337.73, "Refuel_Recharge_time_min": 7.2, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 18.99}, {"Vehicle_ID": "155", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 12, "Distance_km": 605.0, "Fuel_Cost_INR": 2469.4, "CO2_emitted_kg": 63.32, "Maintenance_Cost_INR": 736.08, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 19.11}, {"Vehicle_ID": "156", "Fuel_Type": "CNG", "Vehicle_Age_yrs": 12, "Distance_km": 578.0, "Fuel_Cost_INR": 2156.87, "CO2_emitted_kg": 55.3, "Maintenance_Cost_INR": 673.33, "Refuel_Recharge_time_min": 8.0, "Fuel_Price_INR_per_unit": 78.0, "Mileage_km_per_unit": 20.9}, {"Vehicle_ID": "157", "Fuel_Type": "E85", "Vehicle_Age_yrs": 0, "Distance_km": 1625.0, "Fuel_Cost_INR": 10595.37, "CO2_emitted_kg": 209.44, "Maintenance_Cost_INR": 1499.36, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.19}, {"Vehicle_ID": "158", "Fuel_Type": "E85", "Vehicle_Age_yrs": 0, "Distance_km": 2095.0, "Fuel_Cost_INR": 13065.48, "CO2_emitted_kg": 258.27, "Maintenance_Cost_INR": 1944.74, "Refuel_Recharge_time_min": 5.8, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.79}, {"Vehicle_ID": "159", "Fuel_Type": "E85", "Vehicle_Age_yrs": 0, "Distance_km": 2041.0, "Fuel_Cost_INR": 12620.75, "CO2_emitted_kg": 249.48, "Maintenance_Cost_INR": 1571.66, "Refuel_Recharge_time_min": 4.7, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.91}, {"Vehicle_ID": "160", "Fuel_Type": "E85", "Vehicle_Age_yrs": 0, "Distance_km": 1532.0, "Fuel_Cost_INR": 9490.59, "CO2_emitted_kg": 187.6, "Maintenance_Cost_INR": 1222.32, "Refuel_Recharge_time_min": 5.6, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.88}, {"Vehicle_ID": "161", "Fuel_Type": "E85", "Vehicle_Age_yrs": 1, "Distance_km": 551.0, "Fuel_Cost_INR": 3664.29, "CO2_emitted_kg": 72.43, "Maintenance_Cost_INR": 475.9, "Refuel_Recharge_time_min": 4.8, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.93}, {"Vehicle_ID": "162", "Fuel_Type": "E85", "Vehicle_Age_yrs": 1, "Distance_km": 998.0, "Fuel_Cost_INR": 6540.51, "CO2_emitted_kg": 129.29, "Maintenance_Cost_INR": 879.18, "Refuel_Recharge_time_min": 4.4, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.12}, {"Vehicle_ID": "163", "Fuel_Type": "E85", "Vehicle_Age_yrs": 1, "Distance_km": 1057.0, "Fuel_Cost_INR": 6580.38, "CO2_emitted_kg": 130.08, "Maintenance_Cost_INR": 916.17, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.81}, {"Vehicle_ID": "164", "Fuel_Type": "E85", "Vehicle_Age_yrs": 1, "Distance_km": 1875.0, "Fuel_Cost_INR": 11844.88, "CO2_emitted_kg": 234.14, "Maintenance_Cost_INR": 1624.73, "Refuel_Recharge_time_min": 5.4, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.61}, {"Vehicle_ID": "165", "Fuel_Type": "E85", "Vehicle_Age_yrs": 2, "Distance_km": 2035.0, "Fuel_Cost_INR": 13265.43, "CO2_emitted_kg": 262.22, "Maintenance_Cost_INR": 1980.56, "Refuel_Recharge_time_min": 4.5, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.19}, {"Vehicle_ID": "166", "Fuel_Type": "E85", "Vehicle_Age_yrs": 2, "Distance_km": 1782.0, "Fuel_Cost_INR": 12111.76, "CO2_emitted_kg": 239.42, "Maintenance_Cost_INR": 1627.15, "Refuel_Recharge_time_min": 6.2, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.65}, {"Vehicle_ID": "167", "Fuel_Type": "E85", "Vehicle_Age_yrs": 2, "Distance_km": 1390.0, "Fuel_Cost_INR": 9509.01, "CO2_emitted_kg": 187.97, "Maintenance_Cost_INR": 1377.56, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.57}, {"Vehicle_ID": "168", "Fuel_Type": "E85", "Vehicle_Age_yrs": 2, "Distance_km": 1140.0, "Fuel_Cost_INR": 7232.84, "CO2_emitted_kg": 142.97, "Maintenance_Cost_INR": 1107.05, "Refuel_Recharge_time_min": 6.1, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.55}, {"Vehicle_ID": "169", "Fuel_Type": "E85", "Vehicle_Age_yrs": 3, "Distance_km": 1822.0, "Fuel_Cost_INR": 12709.78, "CO2_emitted_kg": 251.24, "Maintenance_Cost_INR": 1779.25, "Refuel_Recharge_time_min": 5.5, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.33}, {"Vehicle_ID": "170", "Fuel_Type": "E85", "Vehicle_Age_yrs": 3, "Distance_km": 1940.0, "Fuel_Cost_INR": 13197.12, "CO2_emitted_kg": 260.87, "Maintenance_Cost_INR": 1808.71, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.64}, {"Vehicle_ID": "171", "Fuel_Type": "E85", "Vehicle_Age_yrs": 3, "Distance_km": 1889.0, "Fuel_Cost_INR": 12981.05, "CO2_emitted_kg": 256.6, "Maintenance_Cost_INR": 2072.92, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.51}, {"Vehicle_ID": "172", "Fuel_Type": "E85", "Vehicle_Age_yrs": 3, "Distance_km": 1942.0, "Fuel_Cost_INR": 12393.39, "CO2_emitted_kg": 244.99, "Maintenance_Cost_INR": 2157.41, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.48}, {"Vehicle_ID": "173", "Fuel_Type": "E85", "Vehicle_Age_yrs": 4, "Distance_km": 940.0, "Fuel_Cost_INR": 6601.86, "CO2_emitted_kg": 130.5, "Maintenance_Cost_INR": 1024.02, "Refuel_Recharge_time_min": 5.7, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.25}, {"Vehicle_ID": "174", "Fuel_Type": "E85", "Vehicle_Age_yrs": 4, "Distance_km": 1491.0, "Fuel_Cost_INR": 9803.59, "CO2_emitted_kg": 193.79, "Maintenance_Cost_INR": 1461.62, "Refuel_Recharge_time_min": 6.9, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.08}, {"Vehicle_ID": "175", "Fuel_Type": "E85", "Vehicle_Age_yrs": 4, "Distance_km": 2059.0, "Fuel_Cost_INR": 14291.64, "CO2_emitted_kg": 282.51, "Maintenance_Cost_INR": 2330.61, "Refuel_Recharge_time_min": 6.2, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.39}, {"Vehicle_ID": "176", "Fuel_Type": "E85", "Vehicle_Age_yrs": 4, "Distance_km": 1532.0, "Fuel_Cost_INR": 10064.8, "CO2_emitted_kg": 198.96, "Maintenance_Cost_INR": 1724.86, "Refuel_Recharge_time_min": 4.1, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.09}, {"Vehicle_ID": "177", "Fuel_Type": "E85", "Vehicle_Age_yrs": 5, "Distance_km": 2124.0, "Fuel_Cost_INR": 15028.96, "CO2_emitted_kg": 297.08, "Maintenance_Cost_INR": 2237.35, "Refuel_Recharge_time_min": 6.3, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.15}, {"Vehicle_ID": "178", "Fuel_Type": "E85", "Vehicle_Age_yrs": 5, "Distance_km": 1152.0, "Fuel_Cost_INR": 8448.48, "CO2_emitted_kg": 167.0, "Maintenance_Cost_INR": 1268.85, "Refuel_Recharge_time_min": 6.4, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.73}, {"Vehicle_ID": "179", "Fuel_Type": "E85", "Vehicle_Age_yrs": 5, "Distance_km": 926.0, "Fuel_Cost_INR": 6355.41, "CO2_emitted_kg": 125.63, "Maintenance_Cost_INR": 1001.28, "Refuel_Recharge_time_min": 4.0, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.53}, {"Vehicle_ID": "180", "Fuel_Type": "E85", "Vehicle_Age_yrs": 5, "Distance_km": 1264.0, "Fuel_Cost_INR": 9196.43, "CO2_emitted_kg": 181.79, "Maintenance_Cost_INR": 1528.48, "Refuel_Recharge_time_min": 6.2, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.82}, {"Vehicle_ID": "181", "Fuel_Type": "E85", "Vehicle_Age_yrs": 6, "Distance_km": 1768.0, "Fuel_Cost_INR": 11700.41, "CO2_emitted_kg": 231.29, "Maintenance_Cost_INR": 2310.43, "Refuel_Recharge_time_min": 4.8, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 13.0}, {"Vehicle_ID": "182", "Fuel_Type": "E85", "Vehicle_Age_yrs": 6, "Distance_km": 1701.0, "Fuel_Cost_INR": 11311.88, "CO2_emitted_kg": 223.61, "Maintenance_Cost_INR": 2054.85, "Refuel_Recharge_time_min": 5.1, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.93}, {"Vehicle_ID": "183", "Fuel_Type": "E85", "Vehicle_Age_yrs": 6, "Distance_km": 1588.0, "Fuel_Cost_INR": 11522.05, "CO2_emitted_kg": 227.76, "Maintenance_Cost_INR": 1784.53, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.85}, {"Vehicle_ID": "184", "Fuel_Type": "E85", "Vehicle_Age_yrs": 6, "Distance_km": 1812.0, "Fuel_Cost_INR": 12074.14, "CO2_emitted_kg": 238.67, "Maintenance_Cost_INR": 2168.23, "Refuel_Recharge_time_min": 5.8, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.91}, {"Vehicle_ID": "185", "Fuel_Type": "E85", "Vehicle_Age_yrs": 7, "Distance_km": 2160.0, "Fuel_Cost_INR": 15700.49, "CO2_emitted_kg": 310.36, "Maintenance_Cost_INR": 2951.66, "Refuel_Recharge_time_min": 4.3, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.83}, {"Vehicle_ID": "186", "Fuel_Type": "E85", "Vehicle_Age_yrs": 7, "Distance_km": 815.0, "Fuel_Cost_INR": 6002.39, "CO2_emitted_kg": 118.65, "Maintenance_Cost_INR": 977.08, "Refuel_Recharge_time_min": 5.6, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.68}, {"Vehicle_ID": "187", "Fuel_Type": "E85", "Vehicle_Age_yrs": 7, "Distance_km": 984.0, "Fuel_Cost_INR": 6989.46, "CO2_emitted_kg": 138.16, "Maintenance_Cost_INR": 1121.63, "Refuel_Recharge_time_min": 6.8, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.11}, {"Vehicle_ID": "188", "Fuel_Type": "E85", "Vehicle_Age_yrs": 7, "Distance_km": 1503.0, "Fuel_Cost_INR": 10728.95, "CO2_emitted_kg": 212.08, "Maintenance_Cost_INR": 1985.32, "Refuel_Recharge_time_min": 6.0, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.05}, {"Vehicle_ID": "189", "Fuel_Type": "E85", "Vehicle_Age_yrs": 8, "Distance_km": 607.0, "Fuel_Cost_INR": 4286.72, "CO2_emitted_kg": 84.74, "Maintenance_Cost_INR": 777.71, "Refuel_Recharge_time_min": 5.2, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.18}, {"Vehicle_ID": "190", "Fuel_Type": "E85", "Vehicle_Age_yrs": 8, "Distance_km": 1487.0, "Fuel_Cost_INR": 11382.89, "CO2_emitted_kg": 225.01, "Maintenance_Cost_INR": 1935.77, "Refuel_Recharge_time_min": 4.6, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.23}, {"Vehicle_ID": "191", "Fuel_Type": "E85", "Vehicle_Age_yrs": 8, "Distance_km": 2044.0, "Fuel_Cost_INR": 15596.13, "CO2_emitted_kg": 308.3, "Maintenance_Cost_INR": 2453.02, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.27}, {"Vehicle_ID": "192", "Fuel_Type": "E85", "Vehicle_Age_yrs": 8, "Distance_km": 2073.0, "Fuel_Cost_INR": 14409.68, "CO2_emitted_kg": 284.84, "Maintenance_Cost_INR": 2573.59, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.37}, {"Vehicle_ID": "193", "Fuel_Type": "E85", "Vehicle_Age_yrs": 9, "Distance_km": 1576.0, "Fuel_Cost_INR": 11352.12, "CO2_emitted_kg": 224.4, "Maintenance_Cost_INR": 2134.05, "Refuel_Recharge_time_min": 6.2, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.94}, {"Vehicle_ID": "194", "Fuel_Type": "E85", "Vehicle_Age_yrs": 9, "Distance_km": 644.0, "Fuel_Cost_INR": 4510.21, "CO2_emitted_kg": 89.16, "Maintenance_Cost_INR": 952.87, "Refuel_Recharge_time_min": 6.0, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.28}, {"Vehicle_ID": "195", "Fuel_Type": "E85", "Vehicle_Age_yrs": 9, "Distance_km": 814.0, "Fuel_Cost_INR": 6113.07, "CO2_emitted_kg": 120.84, "Maintenance_Cost_INR": 1045.76, "Refuel_Recharge_time_min": 5.6, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.45}, {"Vehicle_ID": "196", "Fuel_Type": "E85", "Vehicle_Age_yrs": 9, "Distance_km": 1763.0, "Fuel_Cost_INR": 13432.16, "CO2_emitted_kg": 265.52, "Maintenance_Cost_INR": 2449.27, "Refuel_Recharge_time_min": 6.7, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.29}, {"Vehicle_ID": "197", "Fuel_Type": "E85", "Vehicle_Age_yrs": 10, "Distance_km": 578.0, "Fuel_Cost_INR": 4204.04, "CO2_emitted_kg": 83.1, "Maintenance_Cost_INR": 902.15, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.82}, {"Vehicle_ID": "198", "Fuel_Type": "E85", "Vehicle_Age_yrs": 10, "Distance_km": 1232.0, "Fuel_Cost_INR": 8633.33, "CO2_emitted_kg": 170.66, "Maintenance_Cost_INR": 1935.8, "Refuel_Recharge_time_min": 5.0, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.27}, {"Vehicle_ID": "199", "Fuel_Type": "E85", "Vehicle_Age_yrs": 10, "Distance_km": 813.0, "Fuel_Cost_INR": 5726.91, "CO2_emitted_kg": 113.21, "Maintenance_Cost_INR": 1222.5, "Refuel_Recharge_time_min": 4.7, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 12.21}, {"Vehicle_ID": "200", "Fuel_Type": "E85", "Vehicle_Age_yrs": 10, "Distance_km": 1011.0, "Fuel_Cost_INR": 7682.1, "CO2_emitted_kg": 151.86, "Maintenance_Cost_INR": 1427.92, "Refuel_Recharge_time_min": 6.8, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.32}, {"Vehicle_ID": "201", "Fuel_Type": "E85", "Vehicle_Age_yrs": 11, "Distance_km": 1008.0, "Fuel_Cost_INR": 7870.27, "CO2_emitted_kg": 155.58, "Maintenance_Cost_INR": 1547.94, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.01}, {"Vehicle_ID": "202", "Fuel_Type": "E85", "Vehicle_Age_yrs": 11, "Distance_km": 1094.0, "Fuel_Cost_INR": 8480.86, "CO2_emitted_kg": 167.64, "Maintenance_Cost_INR": 1736.25, "Refuel_Recharge_time_min": 4.6, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.09}, {"Vehicle_ID": "203", "Fuel_Type": "E85", "Vehicle_Age_yrs": 11, "Distance_km": 1481.0, "Fuel_Cost_INR": 10723.4, "CO2_emitted_kg": 211.97, "Maintenance_Cost_INR": 2307.11, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.88}, {"Vehicle_ID": "204", "Fuel_Type": "E85", "Vehicle_Age_yrs": 11, "Distance_km": 1003.0, "Fuel_Cost_INR": 7543.77, "CO2_emitted_kg": 149.12, "Maintenance_Cost_INR": 1478.69, "Refuel_Recharge_time_min": 5.2, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.43}, {"Vehicle_ID": "205", "Fuel_Type": "E85", "Vehicle_Age_yrs": 12, "Distance_km": 1685.0, "Fuel_Cost_INR": 12207.91, "CO2_emitted_kg": 241.32, "Maintenance_Cost_INR": 2486.92, "Refuel_Recharge_time_min": 5.9, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.87}, {"Vehicle_ID": "206", "Fuel_Type": "E85", "Vehicle_Age_yrs": 12, "Distance_km": 1568.0, "Fuel_Cost_INR": 11807.7, "CO2_emitted_kg": 233.41, "Maintenance_Cost_INR": 2375.91, "Refuel_Recharge_time_min": 4.5, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.42}, {"Vehicle_ID": "207", "Fuel_Type": "E85", "Vehicle_Age_yrs": 12, "Distance_km": 1528.0, "Fuel_Cost_INR": 11199.27, "CO2_emitted_kg": 221.38, "Maintenance_Cost_INR": 2381.2, "Refuel_Recharge_time_min": 4.2, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 11.73}, {"Vehicle_ID": "208", "Fuel_Type": "E85", "Vehicle_Age_yrs": 12, "Distance_km": 754.0, "Fuel_Cost_INR": 5949.43, "CO2_emitted_kg": 117.6, "Maintenance_Cost_INR": 1222.37, "Refuel_Recharge_time_min": 6.6, "Fuel_Price_INR_per_unit": 86.0, "Mileage_km_per_unit": 10.9}, {"Vehicle_ID": "209", "Fuel_Type": "EV", "Vehicle_Age_yrs": 0, "Distance_km": 651.0, "Fuel_Cost_INR": 900.25, "CO2_emitted_kg": 68.84, "Maintenance_Cost_INR": 243.54, "Refuel_Recharge_time_min": 49.3, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 6.15}, {"Vehicle_ID": "210", "Fuel_Type": "EV", "Vehicle_Age_yrs": 0, "Distance_km": 1796.0, "Fuel_Cost_INR": 2461.63, "CO2_emitted_kg": 188.24, "Maintenance_Cost_INR": 647.7, "Refuel_Recharge_time_min": 54.2, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 6.2}, {"Vehicle_ID": "211", "Fuel_Type": "EV", "Vehicle_Age_yrs": 0, "Distance_km": 695.0, "Fuel_Cost_INR": 1023.98, "CO2_emitted_kg": 78.3, "Maintenance_Cost_INR": 238.88, "Refuel_Recharge_time_min": 39.4, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.77}, {"Vehicle_ID": "212", "Fuel_Type": "EV", "Vehicle_Age_yrs": 0, "Distance_km": 2184.0, "Fuel_Cost_INR": 2990.7, "CO2_emitted_kg": 228.7, "Maintenance_Cost_INR": 842.89, "Refuel_Recharge_time_min": 47.6, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 6.21}, {"Vehicle_ID": "213", "Fuel_Type": "EV", "Vehicle_Age_yrs": 1, "Distance_km": 1982.0, "Fuel_Cost_INR": 2819.36, "CO2_emitted_kg": 215.6, "Maintenance_Cost_INR": 777.51, "Refuel_Recharge_time_min": 43.4, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.98}, {"Vehicle_ID": "214", "Fuel_Type": "EV", "Vehicle_Age_yrs": 1, "Distance_km": 1117.0, "Fuel_Cost_INR": 1660.47, "CO2_emitted_kg": 126.98, "Maintenance_Cost_INR": 428.12, "Refuel_Recharge_time_min": 37.9, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.72}, {"Vehicle_ID": "215", "Fuel_Type": "EV", "Vehicle_Age_yrs": 1, "Distance_km": 1374.0, "Fuel_Cost_INR": 2027.37, "CO2_emitted_kg": 155.03, "Maintenance_Cost_INR": 509.0, "Refuel_Recharge_time_min": 51.3, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.76}, {"Vehicle_ID": "216", "Fuel_Type": "EV", "Vehicle_Age_yrs": 1, "Distance_km": 1761.0, "Fuel_Cost_INR": 2725.66, "CO2_emitted_kg": 208.43, "Maintenance_Cost_INR": 652.82, "Refuel_Recharge_time_min": 36.3, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.49}, {"Vehicle_ID": "217", "Fuel_Type": "EV", "Vehicle_Age_yrs": 2, "Distance_km": 1479.0, "Fuel_Cost_INR": 2113.57, "CO2_emitted_kg": 161.63, "Maintenance_Cost_INR": 666.35, "Refuel_Recharge_time_min": 46.6, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.95}, {"Vehicle_ID": "218", "Fuel_Type": "EV", "Vehicle_Age_yrs": 2, "Distance_km": 1633.0, "Fuel_Cost_INR": 2286.5, "CO2_emitted_kg": 174.85, "Maintenance_Cost_INR": 686.88, "Refuel_Recharge_time_min": 54.0, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 6.07}, {"Vehicle_ID": "219", "Fuel_Type": "EV", "Vehicle_Age_yrs": 2, "Distance_km": 452.0, "Fuel_Cost_INR": 674.86, "CO2_emitted_kg": 51.61, "Maintenance_Cost_INR": 196.2, "Refuel_Recharge_time_min": 38.5, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.69}, {"Vehicle_ID": "220", "Fuel_Type": "EV", "Vehicle_Age_yrs": 2, "Distance_km": 1792.0, "Fuel_Cost_INR": 2712.44, "CO2_emitted_kg": 207.42, "Maintenance_Cost_INR": 719.39, "Refuel_Recharge_time_min": 36.6, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.62}, {"Vehicle_ID": "221", "Fuel_Type": "EV", "Vehicle_Age_yrs": 3, "Distance_km": 1692.0, "Fuel_Cost_INR": 2536.13, "CO2_emitted_kg": 193.94, "Maintenance_Cost_INR": 709.82, "Refuel_Recharge_time_min": 44.4, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.67}, {"Vehicle_ID": "222", "Fuel_Type": "EV", "Vehicle_Age_yrs": 3, "Distance_km": 1641.0, "Fuel_Cost_INR": 2539.13, "CO2_emitted_kg": 194.17, "Maintenance_Cost_INR": 728.6, "Refuel_Recharge_time_min": 39.5, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.49}, {"Vehicle_ID": "223", "Fuel_Type": "EV", "Vehicle_Age_yrs": 3, "Distance_km": 444.0, "Fuel_Cost_INR": 655.75, "CO2_emitted_kg": 50.15, "Maintenance_Cost_INR": 220.83, "Refuel_Recharge_time_min": 46.7, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.76}, {"Vehicle_ID": "224", "Fuel_Type": "EV", "Vehicle_Age_yrs": 3, "Distance_km": 1581.0, "Fuel_Cost_INR": 2496.05, "CO2_emitted_kg": 190.87, "Maintenance_Cost_INR": 748.49, "Refuel_Recharge_time_min": 41.6, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.38}, {"Vehicle_ID": "225", "Fuel_Type": "EV", "Vehicle_Age_yrs": 4, "Distance_km": 1505.0, "Fuel_Cost_INR": 2220.57, "CO2_emitted_kg": 169.81, "Maintenance_Cost_INR": 800.3, "Refuel_Recharge_time_min": 54.0, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.76}, {"Vehicle_ID": "226", "Fuel_Type": "EV", "Vehicle_Age_yrs": 4, "Distance_km": 1630.0, "Fuel_Cost_INR": 2344.8, "CO2_emitted_kg": 179.31, "Maintenance_Cost_INR": 741.23, "Refuel_Recharge_time_min": 37.9, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.91}, {"Vehicle_ID": "227", "Fuel_Type": "EV", "Vehicle_Age_yrs": 4, "Distance_km": 1979.0, "Fuel_Cost_INR": 3033.63, "CO2_emitted_kg": 231.98, "Maintenance_Cost_INR": 879.13, "Refuel_Recharge_time_min": 36.1, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.55}, {"Vehicle_ID": "228", "Fuel_Type": "EV", "Vehicle_Age_yrs": 4, "Distance_km": 1804.0, "Fuel_Cost_INR": 2795.42, "CO2_emitted_kg": 213.77, "Maintenance_Cost_INR": 829.78, "Refuel_Recharge_time_min": 41.5, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.49}, {"Vehicle_ID": "229", "Fuel_Type": "EV", "Vehicle_Age_yrs": 5, "Distance_km": 971.0, "Fuel_Cost_INR": 1427.74, "CO2_emitted_kg": 109.18, "Maintenance_Cost_INR": 497.01, "Refuel_Recharge_time_min": 47.7, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.78}, {"Vehicle_ID": "230", "Fuel_Type": "EV", "Vehicle_Age_yrs": 5, "Distance_km": 1546.0, "Fuel_Cost_INR": 2331.19, "CO2_emitted_kg": 178.27, "Maintenance_Cost_INR": 744.02, "Refuel_Recharge_time_min": 49.2, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.64}, {"Vehicle_ID": "231", "Fuel_Type": "EV", "Vehicle_Age_yrs": 5, "Distance_km": 905.0, "Fuel_Cost_INR": 1400.2, "CO2_emitted_kg": 107.07, "Maintenance_Cost_INR": 430.3, "Refuel_Recharge_time_min": 44.1, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.49}, {"Vehicle_ID": "232", "Fuel_Type": "EV", "Vehicle_Age_yrs": 5, "Distance_km": 1414.0, "Fuel_Cost_INR": 2199.97, "CO2_emitted_kg": 168.23, "Maintenance_Cost_INR": 751.34, "Refuel_Recharge_time_min": 50.6, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.46}, {"Vehicle_ID": "233", "Fuel_Type": "EV", "Vehicle_Age_yrs": 6, "Distance_km": 1702.0, "Fuel_Cost_INR": 2684.77, "CO2_emitted_kg": 205.31, "Maintenance_Cost_INR": 958.16, "Refuel_Recharge_time_min": 47.3, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.39}, {"Vehicle_ID": "234", "Fuel_Type": "EV", "Vehicle_Age_yrs": 6, "Distance_km": 1976.0, "Fuel_Cost_INR": 3166.7, "CO2_emitted_kg": 242.16, "Maintenance_Cost_INR": 985.39, "Refuel_Recharge_time_min": 36.2, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.3}, {"Vehicle_ID": "235", "Fuel_Type": "EV", "Vehicle_Age_yrs": 6, "Distance_km": 1825.0, "Fuel_Cost_INR": 2967.13, "CO2_emitted_kg": 226.9, "Maintenance_Cost_INR": 987.95, "Refuel_Recharge_time_min": 52.2, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.23}, {"Vehicle_ID": "236", "Fuel_Type": "EV", "Vehicle_Age_yrs": 6, "Distance_km": 725.0, "Fuel_Cost_INR": 1090.29, "CO2_emitted_kg": 83.37, "Maintenance_Cost_INR": 418.94, "Refuel_Recharge_time_min": 50.4, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.65}, {"Vehicle_ID": "237", "Fuel_Type": "EV", "Vehicle_Age_yrs": 7, "Distance_km": 724.0, "Fuel_Cost_INR": 1160.71, "CO2_emitted_kg": 88.76, "Maintenance_Cost_INR": 432.61, "Refuel_Recharge_time_min": 41.1, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.3}, {"Vehicle_ID": "238", "Fuel_Type": "EV", "Vehicle_Age_yrs": 7, "Distance_km": 1682.0, "Fuel_Cost_INR": 2577.28, "CO2_emitted_kg": 197.09, "Maintenance_Cost_INR": 906.9, "Refuel_Recharge_time_min": 54.5, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.55}, {"Vehicle_ID": "239", "Fuel_Type": "EV", "Vehicle_Age_yrs": 7, "Distance_km": 934.0, "Fuel_Cost_INR": 1460.58, "CO2_emitted_kg": 111.69, "Maintenance_Cost_INR": 507.8, "Refuel_Recharge_time_min": 38.6, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.44}, {"Vehicle_ID": "240", "Fuel_Type": "EV", "Vehicle_Age_yrs": 7, "Distance_km": 1850.0, "Fuel_Cost_INR": 2845.24, "CO2_emitted_kg": 217.58, "Maintenance_Cost_INR": 1049.22, "Refuel_Recharge_time_min": 51.2, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.53}, {"Vehicle_ID": "241", "Fuel_Type": "EV", "Vehicle_Age_yrs": 8, "Distance_km": 1589.0, "Fuel_Cost_INR": 2517.16, "CO2_emitted_kg": 192.49, "Maintenance_Cost_INR": 945.78, "Refuel_Recharge_time_min": 40.6, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.37}, {"Vehicle_ID": "242", "Fuel_Type": "EV", "Vehicle_Age_yrs": 8, "Distance_km": 1134.0, "Fuel_Cost_INR": 1780.01, "CO2_emitted_kg": 136.12, "Maintenance_Cost_INR": 661.83, "Refuel_Recharge_time_min": 38.6, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.42}, {"Vehicle_ID": "243", "Fuel_Type": "EV", "Vehicle_Age_yrs": 8, "Distance_km": 901.0, "Fuel_Cost_INR": 1389.17, "CO2_emitted_kg": 106.23, "Maintenance_Cost_INR": 574.07, "Refuel_Recharge_time_min": 35.9, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.51}, {"Vehicle_ID": "244", "Fuel_Type": "EV", "Vehicle_Age_yrs": 8, "Distance_km": 940.0, "Fuel_Cost_INR": 1590.32, "CO2_emitted_kg": 121.61, "Maintenance_Cost_INR": 533.54, "Refuel_Recharge_time_min": 45.9, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.02}, {"Vehicle_ID": "245", "Fuel_Type": "EV", "Vehicle_Age_yrs": 9, "Distance_km": 762.0, "Fuel_Cost_INR": 1170.29, "CO2_emitted_kg": 89.49, "Maintenance_Cost_INR": 486.24, "Refuel_Recharge_time_min": 36.2, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.53}, {"Vehicle_ID": "246", "Fuel_Type": "EV", "Vehicle_Age_yrs": 9, "Distance_km": 1492.0, "Fuel_Cost_INR": 2429.78, "CO2_emitted_kg": 185.81, "Maintenance_Cost_INR": 870.25, "Refuel_Recharge_time_min": 36.9, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.22}, {"Vehicle_ID": "247", "Fuel_Type": "EV", "Vehicle_Age_yrs": 9, "Distance_km": 1475.0, "Fuel_Cost_INR": 2409.13, "CO2_emitted_kg": 184.23, "Maintenance_Cost_INR": 869.68, "Refuel_Recharge_time_min": 35.3, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.2}, {"Vehicle_ID": "248", "Fuel_Type": "EV", "Vehicle_Age_yrs": 9, "Distance_km": 1121.0, "Fuel_Cost_INR": 1739.65, "CO2_emitted_kg": 133.03, "Maintenance_Cost_INR": 714.69, "Refuel_Recharge_time_min": 50.5, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.48}, {"Vehicle_ID": "249", "Fuel_Type": "EV", "Vehicle_Age_yrs": 10, "Distance_km": 404.0, "Fuel_Cost_INR": 639.49, "CO2_emitted_kg": 48.9, "Maintenance_Cost_INR": 250.98, "Refuel_Recharge_time_min": 43.6, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.37}, {"Vehicle_ID": "250", "Fuel_Type": "EV", "Vehicle_Age_yrs": 10, "Distance_km": 1651.0, "Fuel_Cost_INR": 2613.0, "CO2_emitted_kg": 199.82, "Maintenance_Cost_INR": 986.41, "Refuel_Recharge_time_min": 40.0, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.37}, {"Vehicle_ID": "251", "Fuel_Type": "EV", "Vehicle_Age_yrs": 10, "Distance_km": 1436.0, "Fuel_Cost_INR": 2442.05, "CO2_emitted_kg": 186.74, "Maintenance_Cost_INR": 905.33, "Refuel_Recharge_time_min": 41.4, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.0}, {"Vehicle_ID": "252", "Fuel_Type": "EV", "Vehicle_Age_yrs": 10, "Distance_km": 702.0, "Fuel_Cost_INR": 1179.44, "CO2_emitted_kg": 90.19, "Maintenance_Cost_INR": 487.64, "Refuel_Recharge_time_min": 53.8, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.06}, {"Vehicle_ID": "253", "Fuel_Type": "EV", "Vehicle_Age_yrs": 11, "Distance_km": 572.0, "Fuel_Cost_INR": 971.8, "CO2_emitted_kg": 74.31, "Maintenance_Cost_INR": 397.21, "Refuel_Recharge_time_min": 41.8, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.0}, {"Vehicle_ID": "254", "Fuel_Type": "EV", "Vehicle_Age_yrs": 11, "Distance_km": 999.0, "Fuel_Cost_INR": 1679.76, "CO2_emitted_kg": 128.45, "Maintenance_Cost_INR": 696.47, "Refuel_Recharge_time_min": 39.0, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.06}, {"Vehicle_ID": "255", "Fuel_Type": "EV", "Vehicle_Age_yrs": 11, "Distance_km": 826.0, "Fuel_Cost_INR": 1395.7, "CO2_emitted_kg": 106.73, "Maintenance_Cost_INR": 585.08, "Refuel_Recharge_time_min": 37.0, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.03}, {"Vehicle_ID": "256", "Fuel_Type": "EV", "Vehicle_Age_yrs": 11, "Distance_km": 2124.0, "Fuel_Cost_INR": 3585.08, "CO2_emitted_kg": 274.15, "Maintenance_Cost_INR": 1544.72, "Refuel_Recharge_time_min": 44.2, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.04}, {"Vehicle_ID": "257", "Fuel_Type": "EV", "Vehicle_Age_yrs": 12, "Distance_km": 2156.0, "Fuel_Cost_INR": 3617.49, "CO2_emitted_kg": 276.63, "Maintenance_Cost_INR": 1439.8, "Refuel_Recharge_time_min": 49.3, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.07}, {"Vehicle_ID": "258", "Fuel_Type": "EV", "Vehicle_Age_yrs": 12, "Distance_km": 1417.0, "Fuel_Cost_INR": 2501.29, "CO2_emitted_kg": 191.28, "Maintenance_Cost_INR": 966.66, "Refuel_Recharge_time_min": 44.5, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 4.82}, {"Vehicle_ID": "259", "Fuel_Type": "EV", "Vehicle_Age_yrs": 12, "Distance_km": 507.0, "Fuel_Cost_INR": 815.03, "CO2_emitted_kg": 62.33, "Maintenance_Cost_INR": 336.67, "Refuel_Recharge_time_min": 47.9, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.29}, {"Vehicle_ID": "260", "Fuel_Type": "EV", "Vehicle_Age_yrs": 12, "Distance_km": 1732.0, "Fuel_Cost_INR": 2911.81, "CO2_emitted_kg": 222.67, "Maintenance_Cost_INR": 1281.08, "Refuel_Recharge_time_min": 36.8, "Fuel_Price_INR_per_unit": 8.5, "Mileage_km_per_unit": 5.06}];
+
+const FUELS = ["Petrol","Diesel","CNG","E85","EV"];
+const COLORS = {Petrol:"var(--petrol)", Diesel:"var(--diesel)", CNG:"var(--cng)", E85:"var(--e85)", EV:"var(--ev)"};
+const HEX = {Petrol:"#3b82f6", Diesel:"#94a0b8", CNG:"#22c55e", E85:"#f5a524", EV:"#a855f7"};
+const fmt = n => "₹" + n.toLocaleString("en-IN", {maximumFractionDigits:2, minimumFractionDigits:2});
+const fmt1 = n => n.toLocaleString("en-IN", {maximumFractionDigits:2});
+
+/* ================= AGGREGATION ================= */
+function aggregateByFuel(rows){
+  const agg = {};
+  FUELS.forEach(f=>{
+    const sub = rows.filter(r=>r.Fuel_Type===f);
+    const dist = sub.reduce((s,r)=>s+r.Distance_km,0);
+    const fc   = sub.reduce((s,r)=>s+r.Fuel_Cost_INR,0);
+    const co2  = sub.reduce((s,r)=>s+r.CO2_emitted_kg,0);
+    const maint= sub.reduce((s,r)=>s+r.Maintenance_Cost_INR,0);
+    const refuel = sub.reduce((s,r)=>s+r.Refuel_Recharge_time_min,0)/sub.length;
+    const price  = sub.reduce((s,r)=>s+r.Fuel_Price_INR_per_unit,0)/sub.length;
+    const mileage= sub.reduce((s,r)=>s+r.Mileage_km_per_unit,0)/sub.length;
+    agg[f] = {
+      costPerKm: fc/dist, co2PerKm: co2/dist, maintPerKm: maint/dist,
+      refuel, price, mileage, n: sub.length
+    };
+  });
+  return agg;
+}
+const AGG = aggregateByFuel(DATA);
+
+/* Age buckets */
+const BUCKETS = [["New (0-2y)",0,2],["Mid-life (3-5y)",3,5],["Aged (6-9y)",6,9],["Old (10+y)",10,99]];
+function bucketAgg(fuel){
+  return BUCKETS.map(([name,lo,hi])=>{
+    const sub = DATA.filter(r=>r.Fuel_Type===fuel && r.Vehicle_Age_yrs>=lo && r.Vehicle_Age_yrs<=hi);
+    if(!sub.length) return {name,costPerKm:null,maintPerKm:null};
+    const dist = sub.reduce((s,r)=>s+r.Distance_km,0);
+    const fc = sub.reduce((s,r)=>s+r.Fuel_Cost_INR,0);
+    const maint = sub.reduce((s,r)=>s+r.Maintenance_Cost_INR,0);
+    return {name, costPerKm: fc/dist, maintPerKm: maint/dist};
+  });
+}
+
+/* Cost/km by single age year, for line chart */
+function costByAge(fuel){
+  const out = [];
+  for(let age=0; age<=12; age++){
+    const sub = DATA.filter(r=>r.Fuel_Type===fuel && r.Vehicle_Age_yrs===age);
+    if(!sub.length){ out.push(null); continue; }
+    const dist = sub.reduce((s,r)=>s+r.Distance_km,0);
+    const fc = sub.reduce((s,r)=>s+r.Fuel_Cost_INR,0);
+    out.push(fc/dist);
+  }
+  return out;
+}
+
+/* E85 paradox */
+const petrol = AGG.Petrol, e85 = AGG.E85;
+const pumpSaving      = (petrol.price - e85.price) / petrol.price * 100;
+const runningPenalty  = (e85.costPerKm - petrol.costPerKm) / petrol.costPerKm * 100;
+const breakEvenPrice  = (e85.mileage / petrol.mileage) * petrol.price;
+
+/* E85 score: cost=4 co2=3 refuel=2 maint=1, normalized vs best/worst across fuels (lower=better) */
+function normScore(metric){
+  const vals = FUELS.map(f=>AGG[f][metric]);
+  const best = Math.min(...vals), worst = Math.max(...vals);
+  if(worst===best) return 1;
+  return 1 - (AGG.E85[metric]-best)/(worst-best);
+}
+const scoreCost   = normScore("costPerKm") * 4;
+const scoreCO2    = normScore("co2PerKm") * 3;
+const scoreRefuel = normScore("refuel") * 2;
+const scoreMaint  = normScore("maintPerKm") * 1;
+const e85Score = scoreCost + scoreCO2 + scoreRefuel + scoreMaint;
+
+/* ================= HEADER ================= */
+document.getElementById("headerTitle").innerHTML =
+  `${CONFIG.vehicle}<span class="sep">·</span><span class="tag">${CONFIG.fuel}</span><span class="sep">·</span>Age: ${CONFIG.age}y<span class="sep">·</span>${CONFIG.kmPerMonth} km/mo`;
+document.getElementById("headerSub").textContent = `${CONFIG.usage} usage · Vehicle Cost Analysis Dashboard`;
+
+/* ================= KPI CARDS ================= */
+const yourFuel = AGG[CONFIG.fuel] || AGG.Petrol;
+const monthlyCost = yourFuel.costPerKm * CONFIG.kmPerMonth;
+const kpis = [
+  {label:`${CONFIG.fuel} cost/km`, value: fmt(yourFuel.costPerKm), accent: HEX[CONFIG.fuel]},
+  {label:"E85 cost/km", value: fmt(e85.costPerKm), accent: HEX.E85},
+  {label:"E85 premium vs Petrol", value: (runningPenalty>=0?"+":"")+runningPenalty.toFixed(1)+"%", accent: HEX.E85, delta:true, deltaVal:runningPenalty},
+  {label:"E85 break-even price", value: fmt(breakEvenPrice)+"/L", accent: HEX.E85},
+  {label:"Your monthly fuel cost", value: fmt(monthlyCost), accent: HEX[CONFIG.fuel]},
+];
+document.getElementById("kpiGrid").innerHTML = kpis.map(k=>`
+  <div class="kpi" style="--accent:${k.accent}">
+    <div class="label">${k.label}</div>
+    <div class="value num">${k.value}</div>
+    ${k.delta? `<div class="delta ${k.deltaVal>=0?'pos':'neg'}">${k.deltaVal>=0?'Costs more to run':'Costs less to run'}</div>` : ''}
+  </div>
+`).join("");
+
+/* ================= TOOLTIP HELPERS ================= */
+const tooltip = document.getElementById("tooltip");
+function showTip(evt, html){
+  tooltip.innerHTML = html;
+  tooltip.style.left = (evt.clientX+14)+"px";
+  tooltip.style.top = (evt.clientY+14)+"px";
+  tooltip.classList.add("show");
+}
+function hideTip(){ tooltip.classList.remove("show"); }
+
+/* ================= BAR CHART: cost/km per fuel ================= */
+(function(){
+  const svg = document.getElementById("barChart");
+  const W=560,H=300, padL=46, padB=34, padT=20;
+  const max = Math.max(...FUELS.map(f=>AGG[f].costPerKm)) * 1.18;
+  const bw = (W-padL-20)/FUELS.length;
+  let html = "";
+  // gridlines
+  for(let i=0;i<=4;i++){
+    const y = padT + (H-padT-padB)*(1-i/4);
+    const val = (max*i/4).toFixed(1);
+    html += `<line x1="${padL}" x2="${W-10}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>`;
+    html += `<text x="${padL-8}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--text-faint)">${val}</text>`;
+  }
+  FUELS.forEach((f,i)=>{
+    const v = AGG[f].costPerKm;
+    const barH = (v/max)*(H-padT-padB);
+    const x = padL + i*bw + bw*0.18;
+    const w = bw*0.64;
+    const y = H-padB-barH;
+    html += `<rect class="bar" data-f="${f}" x="${x}" y="${y}" width="${w}" height="${barH}" rx="6" fill="${HEX[f]}" opacity="0.92" style="cursor:pointer"><title>${f}: ₹${v.toFixed(2)}/km</title></rect>`;
+    html += `<text x="${x+w/2}" y="${y-8}" text-anchor="middle" font-size="11" fill="var(--text)" font-weight="700">${v.toFixed(2)}</text>`;
+    html += `<text x="${x+w/2}" y="${H-padB+18}" text-anchor="middle" font-size="11" fill="var(--text-dim)">${f}</text>`;
+  });
+  svg.innerHTML = html;
+  svg.querySelectorAll(".bar").forEach(el=>{
+    el.addEventListener("mousemove", e=>showTip(e, `<b>${el.dataset.f}</b><br>₹${AGG[el.dataset.f].costPerKm.toFixed(2)} / km`));
+    el.addEventListener("mouseleave", hideTip);
+  });
+  document.getElementById("barLegend").innerHTML = FUELS.map(f=>`<span><i style="background:${HEX[f]}"></i>${f}</span>`).join("");
+})();
+
+/* ================= DOUGHNUT: CO2/km share per fuel ================= */
+(function(){
+  const svg = document.getElementById("doughnutChart");
+  const cx=120, cy=120, r=78, sw=34;
+  const circ = 2*Math.PI*r;
+  const total = FUELS.reduce((s,f)=>s+AGG[f].co2PerKm,0);
+  let offset = 0;
+  let html = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="${sw}"/>`;
+  FUELS.forEach(f=>{
+    const v = AGG[f].co2PerKm;
+    const frac = v/total;
+    const len = frac*circ;
+    html += `<circle class="seg" data-f="${f}" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${HEX[f]}"
+      stroke-width="${sw}" stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-offset}"
+      transform="rotate(-90 ${cx} ${cy})" style="cursor:pointer"><title>${f}: ${v.toFixed(3)} kg/km (${(frac*100).toFixed(1)}%)</title></circle>`;
+    offset += len;
+  });
+  html += `<text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="20" font-weight="700" fill="var(--text)">${total.toFixed(2)}</text>`;
+  html += `<text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="10" fill="var(--text-faint)">kg CO₂/km total</text>`;
+  svg.innerHTML = html;
+  svg.querySelectorAll(".seg").forEach(el=>{
+    const f = el.dataset.f;
+    const frac = AGG[f].co2PerKm/total;
+    el.addEventListener("mousemove", e=>showTip(e, `<b>${f}</b><br>${AGG[f].co2PerKm.toFixed(3)} kg/km<br>${(frac*100).toFixed(1)}% of total`));
+    el.addEventListener("mouseleave", hideTip);
+  });
+  document.getElementById("doughnutLegend").innerHTML = FUELS.map(f=>`<span><i style="background:${HEX[f]}"></i>${f} ${(AGG[f].co2PerKm/total*100).toFixed(0)}%</span>`).join("");
+})();
+
+/* ================= LINE CHART: cost/km vs age ================= */
+(function(){
+  const svg = document.getElementById("lineChart");
+  const W=900,H=320, padL=50,padR=20,padT=20,padB=36;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const series = {}; FUELS.forEach(f=>series[f]=costByAge(f));
+  const allVals = FUELS.flatMap(f=>series[f]).filter(v=>v!==null);
+  const maxV = Math.max(...allVals)*1.1, minV = 0;
+  const xFor = age => padL + (age/12)*plotW;
+  const yFor = v => padT + plotH - ((v-minV)/(maxV-minV))*plotH;
+
+  let html = "";
+  for(let i=0;i<=4;i++){
+    const y = padT + plotH*(1-i/4);
+    html += `<line x1="${padL}" x2="${W-padR}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,0.06)"/>`;
+    html += `<text x="${padL-8}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--text-faint)">${(maxV*i/4).toFixed(1)}</text>`;
+  }
+  for(let age=0; age<=12; age+=2){
+    html += `<text x="${xFor(age)}" y="${H-padB+18}" text-anchor="middle" font-size="10" fill="var(--text-faint)">${age}y</text>`;
+  }
+  // vertical "your car" marker
+  const ax = xFor(CONFIG.age);
+  html += `<line x1="${ax}" x2="${ax}" y1="${padT}" y2="${H-padB}" stroke="${HEX[CONFIG.fuel]}" stroke-width="1.6" stroke-dasharray="5 4" opacity="0.85"/>`;
+  html += `<text x="${ax}" y="${padT-6}" text-anchor="middle" font-size="10.5" fill="${HEX[CONFIG.fuel]}" font-weight="700">Your car · ${CONFIG.age}y</text>`;
+
+  FUELS.forEach(f=>{
+    const pts = series[f].map((v,age)=> v===null? null : `${xFor(age)},${yFor(v)}`).filter(Boolean).join(" ");
+    html += `<polyline points="${pts}" fill="none" stroke="${HEX[f]}" stroke-width="2.4" opacity="0.95"/>`;
+    series[f].forEach((v,age)=>{
+      if(v===null) return;
+      html += `<circle class="pt" data-f="${f}" data-age="${age}" data-v="${v}" cx="${xFor(age)}" cy="${yFor(v)}" r="3.4" fill="${HEX[f]}" style="cursor:pointer"><title>${f} · age ${age}y: ₹${v.toFixed(2)}/km</title></circle>`;
+    });
+  });
+  svg.innerHTML = html;
+  svg.querySelectorAll(".pt").forEach(el=>{
+    el.addEventListener("mousemove", e=>showTip(e, `<b>${el.dataset.f}</b> · age ${el.dataset.age}y<br>₹${parseFloat(el.dataset.v).toFixed(2)} / km`));
+    el.addEventListener("mouseleave", hideTip);
+  });
+})();
+
+/* ================= GAUGE: E85 score ================= */
+(function(){
+  const svg = document.getElementById("gaugeSvg");
+  const cx=110, cy=110, r=86;
+  // semicircle from 180deg to 0deg
+  const startAngle = Math.PI, endAngle = 0;
+  const arcLen = Math.PI * r; // half circumference
+  const pct = e85Score/10;
+  const polar = (ang)=>({x: cx + r*Math.cos(ang), y: cy + r*Math.sin(ang)});
+  const p0 = polar(startAngle), p1 = polar(endAngle);
+  const bg = `M ${p0.x} ${p0.y} A ${r} ${r} 0 0 1 ${p1.x} ${p1.y}`;
+  svg.innerHTML = `
+    <path d="${bg}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="18" stroke-linecap="round"/>
+    <path id="gaugeFg" d="${bg}" fill="none" stroke="${HEX.E85}" stroke-width="18" stroke-linecap="round"
+      stroke-dasharray="${arcLen}" stroke-dashoffset="${arcLen}"
+      style="transition:stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1); filter:drop-shadow(0 0 8px ${HEX.E85}99)"/>
+  `;
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      document.getElementById("gaugeFg").setAttribute("stroke-dashoffset", arcLen*(1-pct));
+    }, 80);
+  });
+  document.getElementById("gaugeNum").textContent = e85Score.toFixed(1);
+})();
+
+/* ================= VERDICT ================= */
+(function(){
+  const verdictEl = document.getElementById("verdictText");
+  const cheaperAtPump = pumpSaving > 0;
+  let verdict;
+  if(e85Score >= 6){
+    verdict = `E85 scores ${e85Score.toFixed(1)}/10 — despite a ${Math.abs(pumpSaving).toFixed(0)}% cheaper pump price, its lower mileage means a ${Math.abs(runningPenalty).toFixed(0)}% running-cost penalty per km versus Petrol; it only makes sense once E85 drops to around ${fmt(breakEvenPrice)}/L.`;
+  } else {
+    verdict = `E85 scores only ${e85Score.toFixed(1)}/10 for this dataset: the pump price looks ${Math.abs(pumpSaving).toFixed(0)}% cheaper than Petrol, but lower mileage erases that, leaving a ${Math.abs(runningPenalty).toFixed(0)}% higher cost per km — it would only break even if priced near ${fmt(breakEvenPrice)}/L, well below today's ₹${e85.price.toFixed(0)}/L.`;
+  }
+  verdictEl.textContent = verdict;
+})();
+
+/* ================= FUEL CARDS ================= */
+const FUEL_INFO = {
+  Petrol: {
+    pros:["Wide refuelling network, fastest fill-ups","Strong resale & service network in India"],
+    cons:["Highest cost/km among liquid fuels here","Highest tailpipe CO₂ per km of the liquids"],
+    best:"Daily mixed city + highway driving where convenience matters most."
+  },
+  Diesel: {
+    pros:["Best mileage per litre, lower cost/km than Petrol","Maintenance/km stays competitive at low age"],
+    cons:["Maintenance/km rises fastest as the vehicle ages","CO₂/km close to Petrol despite the cost edge"],
+    best:"High monthly-distance highway or fleet use where mileage offsets diesel upkeep."
+  },
+  CNG: {
+    pros:["Lowest cost/km of all fuels in this dataset","Lower CO₂/km than Petrol or Diesel"],
+    cons:["Slowest refuel time after EV charging","Fewer filling stations outside major cities"],
+    best:"High-mileage city fleets (cabs, delivery) chasing the lowest running cost."
+  },
+  E85: {
+    pros:["Cheapest pump price per litre of the liquids","Lower CO₂/km than pure Petrol"],
+    cons:["Lower mileage erases the pump-price saving","Highest cost/km of all five fuels here"],
+    best:"Markets where E85 is priced near the break-even point, not at today's price."
+  },
+  EV: {
+    pros:["Lowest cost/km by a wide margin","Lowest maintenance/km, no engine wear costs"],
+    cons:["Longest recharge time vs any refuel option","Upfront vehicle cost not captured in this metric"],
+    best:"Short daily city commutes with reliable home/office charging access."
+  }
+};
+document.getElementById("fuelCards").innerHTML = FUELS.map(f=>{
+  const info = FUEL_INFO[f];
+  const active = f===CONFIG.fuel;
+  return `
+  <div class="fuel-card ${active?'active':''}" style="--accent:${HEX[f]}">
+    <div class="ftitle"><span class="dot"></span>${f}</div>
+    <ul>${info.pros.map(p=>`<li>✅ ${p}</li>`).join("")}</ul>
+    <ul>${info.cons.map(c=>`<li>❌ ${c}</li>`).join("")}</ul>
+    <div class="best">🚗 ${info.best}</div>
+  </div>`;
+}).join("");
+</script>
+</body>
+</html>
