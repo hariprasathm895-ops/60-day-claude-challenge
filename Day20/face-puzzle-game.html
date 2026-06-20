@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Face Puzzle — snap, scramble, solve</title>
+<style>
+  :root{
+    --bg:#14171a;
+    --bg-soft:#1b1f24;
+    --surface:#1f242a;
+    --surface-raised:#262c33;
+    --line:#333a42;
+    --text:#f4f1ea;
+    --text-dim:#9aa3ac;
+    --amber:#ffb454;
+    --amber-dim:#caa066;
+    --green:#4ade80;
+    --red:#ff6b6b;
+    --radius:14px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, "Avenir Next", "Segoe UI", system-ui, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(120% 140% at 50% -10%, #1d2228 0%, #14171a 55%, #0f1113 100%);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 16px 60px;
+  }
+  *:focus-visible{
+    outline:2px solid var(--amber);
+    outline-offset:2px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  .topbar{
+    width:100%;
+    max-width:560px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:22px;
+    gap:12px;
+  }
+  .topbar .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .brand .dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 0 3px rgba(255,180,84,0.18);
+  }
+  .brand h1{
+    font-size:18px;
+    letter-spacing:0.01em;
+    margin:0;
+    font-weight:700;
+  }
+  .brand span.serial{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:0.08em;
+  }
+  .lb-peek-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.05em;
+    padding:7px 12px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+  }
+  .lb-peek-btn:hover{ border-color:var(--amber-dim); color:var(--text); }
+
+  main{
+    width:100%;
+    max-width:560px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .screen{ display:none; width:100%; flex-direction:column; align-items:center; }
+  .screen.active{ display:flex; }
+
+  .tagline{
+    font-size:13px;
+    color:var(--text-dim);
+    text-align:center;
+    margin:0 0 20px;
+    max-width:380px;
+    line-height:1.5;
+  }
+
+  /* ---- Viewfinder ---- */
+  .viewfinder{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    aspect-ratio:1/1;
+    border-radius:18px;
+    overflow:hidden;
+    background:#000;
+    box-shadow:0 0 0 1px var(--line), 0 24px 50px -20px rgba(0,0,0,0.7);
+  }
+  .viewfinder video, .viewfinder canvas.preview-img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transform:scaleX(-1);
+  }
+  .vf-corner{
+    position:absolute;
+    width:26px;height:26px;
+    border:2px solid var(--amber);
+    opacity:0.85;
+    pointer-events:none;
+  }
+  .vf-corner.tl{ top:14px; left:14px; border-right:none; border-bottom:none; }
+  .vf-corner.tr{ top:14px; right:14px; border-left:none; border-bottom:none; }
+  .vf-corner.bl{ bottom:14px; left:14px; border-right:none; border-top:none; }
+  .vf-corner.br{ bottom:14px; right:14px; border-left:none; border-top:none; }
+  .vf-rec{
+    position:absolute;
+    top:14px; left:50%;
+    transform:translateX(-50%);
+    display:flex; align-items:center; gap:6px;
+    background:rgba(0,0,0,0.45);
+    padding:5px 10px;
+    border-radius:999px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.06em;
+    color:var(--text);
+  }
+  .vf-rec .pulse{
+    width:7px;height:7px;border-radius:50%;background:var(--red);
+    animation:pulse 1.4s infinite ease-in-out;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+
+  .cam-error{
+    width:100%;
+    max-width:420px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+    text-align:center;
+    display:none;
+  }
+  .cam-error.show{ display:block; }
+  .cam-error p{ color:var(--text-dim); font-size:13px; line-height:1.5; margin:0 0 14px; }
+  .cam-error h3{ margin:0 0 8px; font-size:15px; }
+
+  .shutter-row{
+    margin-top:22px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  .shutter-btn{
+    width:68px;height:68px;
+    border-radius:50%;
+    background:var(--text);
+    border:4px solid var(--surface-raised);
+    box-shadow:0 0 0 2px var(--line);
+    cursor:pointer;
+    transition:transform .12s ease;
+  }
+  .shutter-btn:active{ transform:scale(0.9); }
+  .shutter-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .shutter-label{ font-family:var(--mono); font-size:11px; color:var(--text-dim); letter-spacing:0.05em; }
+
+  .upload-fallback{
+    margin-top:14px;
+    font-size:12px;
+    color:var(--text-dim);
+  }
+  .upload-fallback label{
+    color:var(--amber);
+    cursor:pointer;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+
+  /* ---- Generic buttons ---- */
+  .btn{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:14px;
+    padding:12px 22px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--surface-raised);
+    color:var(--text);
+    cursor:pointer;
+    transition:border-color .15s, transform .1s, background .15s;
+  }
+  .btn:hover{ border-color:var(--amber-dim); }
+  .btn:active{ transform:scale(0.97); }
+  .btn.primary{
+    background:var(--amber);
+    color:#1a1305;
+    border-color:var(--amber);
+  }
+  .btn.primary:hover{ background:#ffc06e; }
+  .btn.ghost{ background:transparent; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:18px; }
+
+  /* ---- Preview / difficulty screen ---- */
+  .preview-img-wrap{
+    position:relative;
+    width:100%;
+    max-width:340px;
+    aspect-ratio:1/1;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 0 0 1px var(--line);
+  }
+  .preview-img-wrap canvas{ width:100%; height:100%; display:block; }
+
+  .difficulty-label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.1em;
+    color:var(--text-dim);
+    margin:24px 0 10px;
+    text-transform:uppercase;
+  }
+  .diff-row{ display:flex; gap:10px; }
+  .diff-btn{
+    font-family:var(--mono);
+    font-size:14px;
+    width:64px; height:64px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--text);
+    cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:2px;
+    transition:border-color .15s, background .15s;
+  }
+  .diff-btn span{ font-size:9px; color:var(--text-dim); letter-spacing:0.05em; }
+  .diff-btn:hover{ border-color:var(--amber-dim); }
+  .diff-btn.selected{ background:rgba(255,180,84,0.12); border-color:var(--amber); color:var(--amber); }
+  .diff-btn.selected span{ color:var(--amber-dim); }
+
+  /* ---- Game screen ---- */
+  .stat-bar{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .stat{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 12px;
+    text-align:center;
+  }
+  .stat .v{ font-family:var(--mono); font-size:18px; font-weight:600; }
+  .stat .k{ font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
+
+  .board-wrap{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    aspect-ratio:1/1;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 0 0 1px var(--line), 0 24px 50px -20px rgba(0,0,0,0.7);
+    background:#000;
+  }
+  .board{
+    position:absolute;
+    inset:0;
+    display:grid;
+    width:100%;
+    height:100%;
+  }
+  .tile{
+    position:relative;
+    background-size:cover;
+    background-position:center;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.55);
+    cursor:grab;
+    touch-action:none;
+    transition:box-shadow .15s;
+    will-change:transform;
+  }
+  .tile.correct{ box-shadow:inset 0 0 0 2px var(--green); }
+  .tile.dragging{ box-shadow:inset 0 0 0 2px var(--amber); cursor:grabbing; z-index:30; }
+  .tile.drop-hover{ box-shadow:inset 0 0 0 2px #fff; }
+
+  .game-controls{ margin-top:16px; }
+
+  /* ---- Results overlay ---- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(10,11,12,0.78);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .overlay.show{ display:flex; }
+  .overlay-card{
+    width:100%;
+    max-width:380px;
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:26px 24px;
+    text-align:center;
+  }
+  .overlay-card .win-tag{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.12em;
+    color:var(--amber);
+    text-transform:uppercase;
+  }
+  .overlay-card h2{ margin:6px 0 18px; font-size:22px; }
+  .result-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .result-grid .r{
+    background:var(--surface);
+    border-radius:10px;
+    padding:10px 6px;
+  }
+  .result-grid .r .v{ font-family:var(--mono); font-size:16px; font-weight:600; }
+  .result-grid .r .k{ font-family:var(--mono); font-size:8px; color:var(--text-dim); letter-spacing:0.06em; text-transform:uppercase; margin-top:2px; }
+
+  .lb-title{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:0.1em;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    text-align:left;
+    margin:4px 0 8px;
+  }
+  table.lb{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:20px;
+    font-size:12px;
+  }
+  table.lb th, table.lb td{
+    text-align:left;
+    padding:6px 4px;
+    border-bottom:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:var(--mono);
+  }
+  table.lb td.rank{ color:var(--amber); font-weight:700; }
+  table.lb tr.me td{ color:var(--text); }
+  .lb-empty{ font-size:12px; color:var(--text-dim); padding:10px 0 18px; }
+
+  .modal-close{
+    position:absolute;
+    top:14px; right:16px;
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    font-size:20px;
+    cursor:pointer;
+    line-height:1;
+  }
+
+  footer{
+    margin-top:36px;
+    font-family:var(--mono);
+    font-size:10px;
+    color:var(--text-dim);
+    letter-spacing:0.05em;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="dot"></span>
+    <div>
+      <h1>Face Puzzle</h1>
+    </div>
+  </div>
+  <button class="lb-peek-btn" id="peekLbBtn" type="button">Leaderboard</button>
+</div>
+
+<main>
+
+  <!-- CAMERA SCREEN -->
+  <section class="screen active" id="screen-camera">
+    <p class="tagline">Snap a photo, slice it into pieces, and put your own face back together against the clock.</p>
+    <div class="viewfinder">
+      <video id="video" autoplay playsinline muted></video>
+      <div class="vf-corner tl"></div>
+      <div class="vf-corner tr"></div>
+      <div class="vf-corner bl"></div>
+      <div class="vf-corner br"></div>
+      <div class="vf-rec"><span class="pulse"></span>LIVE</div>
+    </div>
+    <div class="cam-error" id="camError">
+      <h3>Camera unavailable</h3>
+      <p id="camErrorMsg">We couldn't reach your webcam. Check that you've allowed camera access for this page, then try again — or use a photo from your device instead.</p>
+      <div class="btn-row">
+        <button class="btn primary" id="retryCamBtn" type="button">Try camera again</button>
+      </div>
+    </div>
+    <div class="shutter-row">
+      <button class="shutter-btn" id="takePhotoBtn" type="button" aria-label="Take photo" disabled></button>
+      <span class="shutter-label">TAKE PHOTO</span>
+    </div>
+    <div class="upload-fallback">
+      No camera? <label for="fileInput">upload a photo instead</label>
+      <input type="file" id="fileInput" accept="image/*" style="display:none;">
+    </div>
+  </section>
+
+  <!-- PREVIEW / DIFFICULTY SCREEN -->
+  <section class="screen" id="screen-preview">
+    <p class="tagline">Looking good. Pick a grid size, then start the clock.</p>
+    <div class="preview-img-wrap">
+      <canvas id="previewCanvas"></canvas>
+    </div>
+    <div class="difficulty-label">Choose difficulty</div>
+    <div class="diff-row">
+      <button class="diff-btn" data-n="3" type="button">3×3<span>EASY</span></button>
+      <button class="diff-btn" data-n="4" type="button">4×4<span>MEDIUM</span></button>
+      <button class="diff-btn" data-n="5" type="button">5×5<span>HARD</span></button>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" id="retakeBtn" type="button">Retake photo</button>
+      <button class="btn primary" id="startBtn" type="button" disabled>Start puzzle</button>
+    </div>
+  </section>
+
+  <!-- GAME SCREEN -->
+  <section class="screen" id="screen-game">
+    <div class="stat-bar">
+      <div class="stat"><div class="v" id="timerDisplay">00:00.0</div><div class="k">Time</div></div>
+      <div class="stat"><div class="v" id="movesDisplay">0</div><div class="k">Moves</div></div>
+      <div class="stat"><div class="v" id="correctDisplay">0/9</div><div class="k">Placed</div></div>
+    </div>
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+    </div>
+    <div class="game-controls btn-row">
+      <button class="btn ghost" id="newPhotoFromGameBtn" type="button">New photo</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- RESULTS OVERLAY -->
+<div class="overlay" id="resultOverlay">
+  <div class="overlay-card">
+    <div class="win-tag">Solved</div>
+    <h2>Puzzle complete</h2>
+    <div class="result-grid">
+      <div class="r"><div class="v" id="resTime">00:00.0</div><div class="k">Time</div></div>
+      <div class="r"><div class="v" id="resMoves">0</div><div class="k">Moves</div></div>
+      <div class="r"><div class="v" id="resDiff">3×3</div><div class="k">Grid</div></div>
+    </div>
+    <div class="lb-title">Best times</div>
+    <div id="resultLbWrap"></div>
+    <div class="btn-row">
+      <button class="btn ghost" id="newPhotoFromResultBtn" type="button">New photo</button>
+      <button class="btn primary" id="playAgainBtn" type="button">Play again</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEADERBOARD PEEK MODAL -->
+<div class="overlay" id="lbModal">
+  <div class="overlay-card" style="position:relative;">
+    <button class="modal-close" id="closeLbBtn" type="button" aria-label="Close">×</button>
+    <div class="win-tag">All-time</div>
+    <h2>Leaderboard</h2>
+    <div id="peekLbWrap"></div>
+  </div>
+</div>
+
+<footer>FACE PUZZLE · YOUR PHOTOS STAY ON YOUR DEVICE</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- State ----------
+  var currentStream = null;
+  var capturedCanvas = null;      // full-resolution square capture (source for slicing)
+  var selectedN = null;           // grid size 3/4/5
+  var pieces = [];                // dataURLs indexed by correct position
+  var board = [];                 // board[cellIndex] = pieceId currently shown there
+  var moves = 0;
+  var timerStart = null;
+  var timerInterval = null;
+  var gameActive = false;
+  var dragState = null;
+
+  var CAPTURE_SIZE = 600;
+  var LB_KEY = "facePuzzleLeaderboard";
+
+  // ---------- Element refs ----------
+  var screens = {
+    camera: document.getElementById('screen-camera'),
+    preview: document.getElementById('screen-preview'),
+    game: document.getElementById('screen-game')
+  };
+  var video = document.getElementById('video');
+  var camError = document.getElementById('camError');
+  var camErrorMsg = document.getElementById('camErrorMsg');
+  var takePhotoBtn = document.getElementById('takePhotoBtn');
+  var retryCamBtn = document.getElementById('retryCamBtn');
+  var fileInput = document.getElementById('fileInput');
+
+  var previewCanvas = document.getElementById('previewCanvas');
+  var diffBtns = Array.prototype.slice.call(document.querySelectorAll('.diff-btn'));
+  var retakeBtn = document.getElementById('retakeBtn');
+  var startBtn = document.getElementById('startBtn');
+
+  var timerDisplay = document.getElementById('timerDisplay');
+  var movesDisplay = document.getElementById('movesDisplay');
+  var correctDisplay = document.getElementById('correctDisplay');
+  var boardEl = document.getElementById('board');
+  var newPhotoFromGameBtn = document.getElementById('newPhotoFromGameBtn');
+
+  var resultOverlay = document.getElementById('resultOverlay');
+  var resTime = document.getElementById('resTime');
+  var resMoves = document.getElementById('resMoves');
+  var resDiff = document.getElementById('resDiff');
+  var resultLbWrap = document.getElementById('resultLbWrap');
+  var newPhotoFromResultBtn = document.getElementById('newPhotoFromResultBtn');
+  var playAgainBtn = document.getElementById('playAgainBtn');
+
+  var peekLbBtn = document.getElementById('peekLbBtn');
+  var lbModal = document.getElementById('lbModal');
+  var closeLbBtn = document.getElementById('closeLbBtn');
+  var peekLbWrap = document.getElementById('peekLbWrap');
+
+  // ---------- Screen switching ----------
+  function showScreen(name){
+    Object.keys(screens).forEach(function(k){
+      screens[k].classList.toggle('active', k === name);
+    });
+  }
+
+  // ---------- Camera ----------
+  function stopStream(){
+    if(currentStream){
+      currentStream.getTracks().forEach(function(t){ t.stop(); });
+      currentStream = null;
+    }
+  }
+
+  function startCamera(){
+    camError.classList.remove('show');
+    takePhotoBtn.disabled = true;
+    var constraintsPreferred = { video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 1280 } }, audio: false };
+
+    function fail(err){
+      var msg = "We couldn't reach your webcam. Check that you've allowed camera access for this page, then try again — or use a photo from your device instead.";
+      if(err && err.name === "NotAllowedError"){
+        msg = "Camera permission was denied. Allow camera access in your browser's address-bar settings, then try again — or upload a photo instead.";
+      } else if(err && err.name === "NotFoundError"){
+        msg = "No camera was found on this device. Upload a photo instead to keep playing.";
+      }
+      camErrorMsg.textContent = msg;
+      camError.classList.add('show');
+      takePhotoBtn.disabled = true;
+    }
+
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      fail({ name: "NotFoundError" });
+      return;
+    }
+
+    navigator.mediaDevices.getUserMedia(constraintsPreferred)
+      .catch(function(){
+        return navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      })
+      .then(function(stream){
+        currentStream = stream;
+        video.srcObject = stream;
+        takePhotoBtn.disabled = false;
+      })
+      .catch(function(err){
+        fail(err);
+      });
+  }
+
+  takePhotoBtn.addEventListener('click', function(){
+    if(!video.videoWidth) return;
+    var side = Math.min(video.videoWidth, video.videoHeight);
+    var sx = (video.videoWidth - side) / 2;
+    var sy = (video.videoHeight - side) / 2;
+
+    var c = document.createElement('canvas');
+    c.width = CAPTURE_SIZE;
+    c.height = CAPTURE_SIZE;
+    var ctx = c.getContext('2d');
+    // mirror horizontally to match the mirrored live preview
+    ctx.save();
+    ctx.translate(CAPTURE_SIZE, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, sx, sy, side, side, 0, 0, CAPTURE_SIZE, CAPTURE_SIZE);
+    ctx.restore();
+
+    capturedCanvas = c;
+    goToPreview();
+  });
+
+  retryCamBtn.addEventListener('click', startCamera);
+
+  fileInput.addEventListener('change', function(e){
+    var file = e.target.files && e.target.files[0];
+    if(!file) return;
+    var img = new Image();
+    img.onload = function(){
+      var side = Math.min(img.width, img.height);
+      var sx = (img.width - side) / 2;
+      var sy = (img.height - side) / 2;
+      var c = document.createElement('canvas');
+      c.width = CAPTURE_SIZE;
+      c.height = CAPTURE_SIZE;
+      var ctx = c.getContext('2d');
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, CAPTURE_SIZE, CAPTURE_SIZE);
+      capturedCanvas = c;
+      goToPreview();
+    };
+    img.src = URL.createObjectURL(file);
+  });
+
+  function goToPreview(){
+    stopStream();
+    var pctx = previewCanvas.getContext('2d');
+    previewCanvas.width = CAPTURE_SIZE;
+    previewCanvas.height = CAPTURE_SIZE;
+    pctx.drawImage(capturedCanvas, 0, 0);
+    selectedN = null;
+    diffBtns.forEach(function(b){ b.classList.remove('selected'); });
+    startBtn.disabled = true;
+    showScreen('preview');
+  }
+
+  retakeBtn.addEventListener('click', function(){
+    showScreen('camera');
+    startCamera();
+  });
+
+  // ---------- Difficulty selection ----------
+  diffBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      diffBtns.forEach(function(b){ b.classList.remove('selected'); });
+      btn.classList.add('selected');
+      selectedN = parseInt(btn.dataset.n, 10);
+      startBtn.disabled = false;
+    });
+  });
+
+  startBtn.addEventListener('click', function(){
+    if(!selectedN) return;
+    buildPuzzle(selectedN);
+    showScreen('game');
+    startTimer();
+  });
+
+  // ---------- Puzzle construction ----------
+  function buildPuzzle(n){
+    var pieceSize = CAPTURE_SIZE / n;
+    pieces = [];
+    for(var r = 0; r < n; r++){
+      for(var c2 = 0; c2 < n; c2++){
+        var pc = document.createElement('canvas');
+        pc.width = pieceSize;
+        pc.height = pieceSize;
+        var pctx = pc.getContext('2d');
+        pctx.drawImage(capturedCanvas, c2 * pieceSize, r * pieceSize, pieceSize, pieceSize, 0, 0, pieceSize, pieceSize);
+        pieces.push(pc.toDataURL('image/jpeg', 0.92));
+      }
+    }
+
+    var total = n * n;
+    board = [];
+    for(var i = 0; i < total; i++) board.push(i);
+    shuffleBoard();
+
+    moves = 0;
+    movesDisplay.textContent = "0";
+    boardEl.style.gridTemplateColumns = "repeat(" + n + ", 1fr)";
+    boardEl.style.gridTemplateRows = "repeat(" + n + ", 1fr)";
+    renderBoard();
+    gameActive = true;
+  }
+
+  function shuffleBoard(){
+    var total = board.length;
+    do {
+      for(var i = total - 1; i > 0; i--){
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = board[i]; board[i] = board[j]; board[j] = tmp;
+      }
+    } while(isSolved() && total > 1);
+  }
+
+  function isSolved(){
+    for(var i = 0; i < board.length; i++){
+      if(board[i] !== i) return false;
+    }
+    return true;
+  }
+
+  function renderBoard(){
+    boardEl.innerHTML = "";
+    var total = board.length;
+    var correctCount = 0;
+    for(var cell = 0; cell < total; cell++){
+      var pieceId = board[cell];
+      var tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.style.backgroundImage = "url(" + pieces[pieceId] + ")";
+      tile.dataset.cell = String(cell);
+      tile.dataset.piece = String(pieceId);
+      if(pieceId === cell){
+        tile.classList.add('correct');
+        correctCount++;
+      }
+      tile.addEventListener('pointerdown', onTilePointerDown);
+      boardEl.appendChild(tile);
+    }
+    correctDisplay.textContent = correctCount + "/" + total;
+    movesDisplay.textContent = String(moves);
+  }
+
+  // ---------- Drag & drop (pointer events: mouse + touch) ----------
+  function onTilePointerDown(e){
+    if(!gameActive) return;
+    var tile = e.currentTarget;
+    try { tile.setPointerCapture(e.pointerId); } catch(err){}
+    dragState = {
+      pointerId: e.pointerId,
+      tile: tile,
+      startX: e.clientX,
+      startY: e.clientY,
+      hoverTile: null
+    };
+    tile.classList.add('dragging');
+    tile.addEventListener('pointermove', onTilePointerMove);
+    tile.addEventListener('pointerup', onTilePointerUp);
+    tile.addEventListener('pointercancel', onTilePointerUp);
+  }
+
+  function onTilePointerMove(e){
+    if(!dragState || e.pointerId !== dragState.pointerId) return;
+    var dx = e.clientX - dragState.startX;
+    var dy = e.clientY - dragState.startY;
+    dragState.tile.style.transform = "translate(" + dx + "px," + dy + "px)";
+
+    dragState.tile.style.pointerEvents = 'none';
+    var elUnder = document.elementFromPoint(e.clientX, e.clientY);
+    dragState.tile.style.pointerEvents = '';
+
+    var targetTile = elUnder ? elUnder.closest('.tile') : null;
+    if(targetTile === dragState.tile) targetTile = null;
+
+    if(dragState.hoverTile && dragState.hoverTile !== targetTile){
+      dragState.hoverTile.classList.remove('drop-hover');
+    }
+    if(targetTile){
+      targetTile.classList.add('drop-hover');
+    }
+    dragState.hoverTile = targetTile;
+  }
+
+  function onTilePointerUp(e){
+    if(!dragState || e.pointerId !== dragState.pointerId) return;
+    var tile = dragState.tile;
+    var target = dragState.hoverTile;
+
+    tile.classList.remove('dragging');
+    tile.style.transform = '';
+    if(target) target.classList.remove('drop-hover');
+
+    tile.removeEventListener('pointermove', onTilePointerMove);
+    tile.removeEventListener('pointerup', onTilePointerUp);
+    tile.removeEventListener('pointercancel', onTilePointerUp);
+
+    if(target && target !== tile){
+      var cellA = Number(tile.dataset.cell);
+      var cellB = Number(target.dataset.cell);
+      var tmp = board[cellA];
+      board[cellA] = board[cellB];
+      board[cellB] = tmp;
+      moves++;
+      renderBoard();
+      checkWin();
+    }
+
+    dragState = null;
+  }
+
+  function checkWin(){
+    if(isSolved()){
+      gameActive = false;
+      stopTimer();
+      var elapsedMs = Date.now() - timerStart;
+      showResults(elapsedMs);
+    }
+  }
+
+  // ---------- Timer ----------
+  function startTimer(){
+    timerStart = Date.now();
+    clearInterval(timerInterval);
+    timerInterval = setInterval(function(){
+      timerDisplay.textContent = formatTime(Date.now() - timerStart);
+    }, 100);
+  }
+
+  function stopTimer(){
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function formatTime(ms){
+    var totalDeci = Math.floor(ms / 100);
+    var mm = Math.floor(totalDeci / 600);
+    var ss = Math.floor((totalDeci % 600) / 10);
+    var t = totalDeci % 10;
+    return pad2(mm) + ":" + pad2(ss) + "." + t;
+  }
+  function pad2(n){ return (n < 10 ? "0" : "") + n; }
+
+  // ---------- Leaderboard ----------
+  function readLeaderboard(){
+    try{
+      var raw = localStorage.getItem(LB_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(err){ return []; }
+  }
+
+  function writeLeaderboard(list){
+    try{ localStorage.setItem(LB_KEY, JSON.stringify(list)); }catch(err){}
+  }
+
+  function addToLeaderboard(entry){
+    var list = readLeaderboard();
+    list.push(entry);
+    list.sort(function(a, b){ return a.ms - b.ms; });
+    list = list.slice(0, 5);
+    writeLeaderboard(list);
+    return list;
+  }
+
+  function renderLeaderboardTable(list, container){
+    if(!list.length){
+      container.innerHTML = '<div class="lb-empty">No times yet — be the first to solve one.</div>';
+      return;
+    }
+    var html = '<table class="lb"><thead><tr><th>#</th><th>Time</th><th>Moves</th><th>Grid</th><th>Date</th></tr></thead><tbody>';
+    list.forEach(function(item, idx){
+      html += '<tr><td class="rank">' + (idx + 1) + '</td><td>' + item.time + '</td><td>' + item.moves + '</td><td>' + item.difficulty + '</td><td>' + item.date + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  }
+
+  // ---------- Results ----------
+  function showResults(elapsedMs){
+    var timeStr = formatTime(elapsedMs);
+    var diffStr = selectedN + "×" + selectedN;
+    resTime.textContent = timeStr;
+    resMoves.textContent = String(moves);
+    resDiff.textContent = diffStr;
+
+    var entry = {
+      date: new Date().toLocaleDateString(),
+      time: timeStr,
+      moves: moves,
+      difficulty: diffStr,
+      ms: elapsedMs
+    };
+    var list = addToLeaderboard(entry);
+    renderLeaderboardTable(list, resultLbWrap);
+
+    resultOverlay.classList.add('show');
+  }
+
+  newPhotoFromGameBtn.addEventListener('click', resetToCamera);
+  newPhotoFromResultBtn.addEventListener('click', function(){
+    resultOverlay.classList.remove('show');
+    resetToCamera();
+  });
+
+  playAgainBtn.addEventListener('click', function(){
+    resultOverlay.classList.remove('show');
+    goToPreview();
+  });
+
+  function resetToCamera(){
+    gameActive = false;
+    stopTimer();
+    showScreen('camera');
+    startCamera();
+  }
+
+  // ---------- Leaderboard peek modal ----------
+  peekLbBtn.addEventListener('click', function(){
+    renderLeaderboardTable(readLeaderboard(), peekLbWrap);
+    lbModal.classList.add('show');
+  });
+  closeLbBtn.addEventListener('click', function(){
+    lbModal.classList.remove('show');
+  });
+  lbModal.addEventListener('click', function(e){
+    if(e.target === lbModal) lbModal.classList.remove('show');
+  });
+
+  // ---------- Init ----------
+  startCamera();
+
+})();
+</script>
+
+</body>
+</html>
