@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Rahul's Prior Authorization Journey</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Healthcare education palette — same blue family as the rest of the series */
+  body{ font-family: -apple-system, "Segoe UI", system-ui, Helvetica, Arial, sans-serif; }
+  .scene-fade{ animation: sceneFade .35s ease; }
+  @keyframes sceneFade{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+  #chatFeed{ scroll-behavior:smooth; }
+  .choice-btn:disabled{ opacity:.45; cursor:not-allowed; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+  <!-- ===================== HEADER / PROGRESS ===================== -->
+  <header class="sticky top-0 z-20 bg-blue-700 border-b-2 border-blue-900 text-white">
+    <div class="max-w-3xl mx-auto px-5 py-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h1 class="font-bold text-lg leading-tight">Rahul's Prior Authorization Journey</h1>
+          <p class="text-blue-100 text-xs tracking-wide uppercase">An illustrative patient story &middot; healthcare education series</p>
+        </div>
+        <button id="restartBtn" class="hidden sm:inline-block bg-blue-800 hover:bg-blue-900 border border-blue-300 text-white text-xs font-bold px-3 py-2 rounded-full">Restart Story</button>
+      </div>
+      <div class="mt-3">
+        <div class="flex justify-between text-[10px] uppercase tracking-wide text-blue-100 mb-1">
+          <span id="progressLabel">Scene 1 of 8</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="w-full h-2 bg-blue-900/50 rounded-full overflow-hidden">
+          <div id="progressFill" class="h-full bg-amber-300 rounded-full" style="width:0%; transition:width .4s ease;"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== CHAT FEED (append-only) ===================== -->
+  <main class="max-w-3xl mx-auto px-4 py-6">
+    <div id="chatFeed" class="flex flex-col gap-3 max-h-[68vh] overflow-y-auto pr-1 pb-3" aria-live="polite"></div>
+  </main>
+
+  <footer class="max-w-3xl mx-auto px-5 pb-10 text-center">
+    <button id="restartBtnMobile" class="sm:hidden bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold px-4 py-2 rounded-full">Restart Story</button>
+    <p class="text-[11px] text-slate-400 mt-4">Educational simulation. "StarCare Health" is an illustrative example, not a real insurer.</p>
+  </footer>
+
+<script>
+/* =============================================================================
+   RAHUL'S PRIOR AUTHORIZATION JOURNEY — story engine
+   Rule: the chat feed is APPEND-ONLY. Every node is built with
+   document.createElement + appendChild. innerHTML is never set on #chatFeed.
+   ============================================================================= */
+(function(){
+  "use strict";
+
+  var feed = document.getElementById("chatFeed");
+  var progressFill = document.getElementById("progressFill");
+  var progressLabel = document.getElementById("progressLabel");
+  var progressPct = document.getElementById("progressPct");
+
+  var TOTAL_SCENES = 8;
+  var sceneIndex = 0; // 0-based, scene 1 == index 0
+
+  /* ---------------------------------------------------------------------
+     LOW-LEVEL DOM HELPERS — every chat element is built and appended here.
+     --------------------------------------------------------------------- */
+  function el(tag, className, text){
+    var node = document.createElement(tag);
+    if(className) node.className = className;
+    if(text !== undefined && text !== null) node.textContent = text;
+    return node;
+  }
+
+  function scrollToBottom(){
+    feed.scrollTop = feed.scrollHeight;
+  }
+
+  // Centered italic line — used for BOTH narrator text and doctor dialogue,
+  // per spec: narrators and doctors are never rendered as chat bubbles.
+  function addNarrator(text){
+    var wrap = el("div", "flex justify-center scene-fade");
+    var span = el("p", "italic text-slate-500 text-sm text-center max-w-xl px-4 py-1", text);
+    wrap.appendChild(span);
+    feed.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  function addDoctor(text){
+    var wrap = el("div", "flex justify-center scene-fade");
+    var span = el("p", "italic text-blue-700 text-sm text-center max-w-xl px-4 py-1 font-medium", text);
+    wrap.appendChild(span);
+    feed.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  // Rahul — patient, left-aligned chat bubble.
+  function addRahul(text){
+    var row = el("div", "flex items-end gap-2 justify-start scene-fade");
+    var avatar = el("div", "text-xl leading-none", "\ud83d\udc66");
+    var bubbleWrap = el("div", "max-w-[78%]");
+    var nameTag = el("div", "text-[10px] font-bold text-slate-500 mb-1 ml-1", "Rahul \u00b7 Patient");
+    var bubble = el("div", "bg-white border border-slate-200 rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm text-slate-800 shadow-sm", text);
+    bubbleWrap.appendChild(nameTag);
+    bubbleWrap.appendChild(bubble);
+    row.appendChild(avatar);
+    row.appendChild(bubbleWrap);
+    feed.appendChild(row);
+    scrollToBottom();
+  }
+
+  // Priya — healthcare operations specialist, right-aligned chat bubble.
+  function addPriya(text){
+    var row = el("div", "flex items-end gap-2 justify-end scene-fade");
+    var bubbleWrap = el("div", "max-w-[78%] flex flex-col items-end");
+    var nameTag = el("div", "text-[10px] font-bold text-blue-100 mb-1 mr-1", "Priya \u00b7 Healthcare Ops Specialist");
+    var bubble = el("div", "bg-blue-700 rounded-2xl rounded-br-sm px-4 py-2.5 text-sm text-white shadow-sm", text);
+    var avatar = el("div", "text-xl leading-none", "\ud83d\udc67");
+    bubbleWrap.appendChild(nameTag);
+    bubbleWrap.appendChild(bubble);
+    row.appendChild(bubbleWrap);
+    row.appendChild(avatar);
+    feed.appendChild(row);
+    scrollToBottom();
+  }
+
+  // Status/citation card — for denial banners, approval banners, and the
+  // AMA citation. Visually distinct from chat bubbles, still append-only.
+  function addCard(kind, titleText, bodyText){
+    var palette = {
+      info:    { border:"border-blue-300",   bg:"bg-blue-50",   title:"text-blue-700" },
+      warn:    { border:"border-red-300",    bg:"bg-red-50",    title:"text-red-700" },
+      success: { border:"border-emerald-300",bg:"bg-emerald-50",title:"text-emerald-700" }
+    };
+    var p = palette[kind] || palette.info;
+    var wrap = el("div", "flex justify-center scene-fade");
+    var card = el("div", "max-w-xl w-full border-2 rounded-xl px-4 py-3 text-sm " + p.border + " " + p.bg);
+    var title = el("div", "font-bold mb-1 " + p.title, titleText);
+    var body = el("div", "text-slate-700", bodyText);
+    card.appendChild(title);
+    card.appendChild(body);
+    wrap.appendChild(card);
+    feed.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  // A labeled list card — used for the Insurance Review checklist and the
+  // final two-perspective Takeaways panels.
+  function addListCard(kind, titleText, items){
+    var palette = {
+      info:    { border:"border-blue-300",   bg:"bg-blue-50",   title:"text-blue-700" },
+      patient: { border:"border-indigo-300", bg:"bg-indigo-50", title:"text-indigo-700" },
+      system:  { border:"border-slate-300",  bg:"bg-slate-100", title:"text-slate-700" }
+    };
+    var p = palette[kind] || palette.info;
+    var wrap = el("div", "flex justify-center scene-fade");
+    var card = el("div", "max-w-xl w-full border-2 rounded-xl px-4 py-3 text-sm " + p.border + " " + p.bg);
+    var title = el("div", "font-bold mb-2 " + p.title, titleText);
+    card.appendChild(title);
+    var ul = el("ul", "list-disc pl-5 space-y-1 text-slate-700");
+    items.forEach(function(item){
+      var li = el("li", "", item);
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    wrap.appendChild(card);
+    feed.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  /* ---------------------------------------------------------------------
+     CHOICES — appended into the feed itself (append-only), removed/locked
+     once picked, then the chosen reaction is appended and the story
+     advances to the next scene.
+     --------------------------------------------------------------------- */
+  function addChoices(options, onPick){
+    var wrap = el("div", "flex flex-col sm:flex-row gap-2 justify-center mt-1 scene-fade");
+    var buttons = [];
+
+    options.forEach(function(opt, idx){
+      var btn = el("button", "choice-btn bg-white border-2 border-blue-300 hover:border-blue-600 hover:bg-blue-50 text-blue-800 text-sm font-medium rounded-xl px-4 py-2.5 max-w-sm text-left", opt.label);
+      btn.type = "button";
+      btn.addEventListener("click", function(){
+        buttons.forEach(function(b){ b.disabled = true; });
+        wrap.classList.add("opacity-60");
+        onPick(opt, idx);
+      });
+      buttons.push(btn);
+      wrap.appendChild(btn);
+    });
+
+    feed.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  function updateProgress(){
+    var pct = Math.round(((sceneIndex) / TOTAL_SCENES) * 100);
+    progressFill.style.width = pct + "%";
+    progressLabel.textContent = "Scene " + (sceneIndex + 1) + " of " + TOTAL_SCENES;
+    progressPct.textContent = pct + "%";
+  }
+
+  function sceneDivider(label){
+    var wrap = el("div", "flex justify-center my-2");
+    var pill = el("span", "text-[10px] font-bold uppercase tracking-wide bg-slate-200 text-slate-600 rounded-full px-3 py-1", label);
+    wrap.appendChild(pill);
+    feed.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  /* =======================================================================
+     THE 8 SCENES
+     Each function renders its dialogue, then calls addChoices(...) which,
+     once picked, appends a short reaction and calls next().
+     ======================================================================= */
+
+  function scene1(){
+    updateProgress();
+    sceneDivider("Scene 1 of 8 \u00b7 Doctor Visit");
+    addNarrator("City Medical Center \u2014 Tuesday morning.");
+    addRahul("Dr. Patel, my joints have been so stiff and swollen for weeks. It's hard to even open a jar.");
+    addNarrator("Dr. Patel examines Rahul's hands and orders bloodwork. Two weeks later\u2026");
+    addDoctor("Dr. Patel: Rahul, your labs confirm Rheumatoid Arthritis. I'm prescribing Humira (adalimumab) \u2014 it should help control the inflammation.");
+    addRahul("Okay\u2026 is that something I just pick up at the pharmacy?");
+    addDoctor("Dr. Patel: Not quite \u2014 Humira is a specialty biologic. Your insurance will need to review it first. My office will handle the paperwork.");
+
+    addChoices([
+      { label: "\ud83d\ude30 \u201cThat sounds complicated. How long will this take?\u201d", reaction: "rahul_anxious" },
+      { label: "\ud83d\ude4f \u201cAt least now I know what's wrong. I just want to feel better.\u201d", reaction: "rahul_relieved" }
+    ], function(opt){
+      addRahul(opt.label.replace(/^\S+\s/, ""));
+      next();
+    });
+  }
+
+  function scene2(){
+    updateProgress();
+    sceneDivider("Scene 2 of 8 \u00b7 Insurance Roadblock");
+    addNarrator("Meanwhile, at Dr. Patel's office\u2026");
+    addNarrator("The clinical team submits a Prior Authorization (PA) request directly to StarCare Health* \u2014 Rahul's insurance plan. No pharmacy is involved at this stage.");
+    addCard("info", "Request Flow", "Provider \u2192 PA Request \u2192 Payer. Once approved, this PA is saved on Rahul's file permanently for this medication.");
+    addPriya("Hi, I'm Priya \u2014 I work in healthcare operations, helping patients and providers navigate Prior Authorization. I'll walk you through what happens next with Rahul's request.");
+
+    addChoices([
+      { label: "\u2753 \u201cWait, what exactly is a Prior Authorization?\u201d", reaction: "ask_what_is_pa" },
+      { label: "\u23f1\ufe0f \u201cHow long does this usually take to get approved?\u201d", reaction: "ask_how_long" }
+    ], function(opt){
+      addRahul(opt.label.replace(/^\S+\s/, ""));
+      next();
+    });
+  }
+
+  function scene3(){
+    updateProgress();
+    sceneDivider("Scene 3 of 8 \u00b7 What is PA?");
+    addPriya("Great question. A Prior Authorization is your insurance company's way of saying: \u2018Before we pay for this, we need to confirm it's medically necessary and the right first step.\u2019");
+    addPriya("It's not just bureaucracy. For aggressive diagnoses like Rheumatoid Arthritis, delays in starting the right treatment can actually affect how the disease progresses.");
+    addCard("warn", "Cited Source", "AMA 2023 PA Survey: Prior Authorization causes treatment delays in the majority of cases.");
+    addPriya("That's exactly why getting the paperwork right the first time matters so much.");
+
+    addChoices([
+      { label: "\ud83e\udd14 \u201cDoes this happen to every patient, or just me?\u201d", reaction: "ask_everyone" },
+      { label: "\ud83d\udcaa \u201cIs there anything I can do to help speed this up?\u201d", reaction: "ask_help" }
+    ], function(opt){
+      addRahul(opt.label.replace(/^\S+\s/, ""));
+      next();
+    });
+  }
+
+  function scene4(){
+    updateProgress();
+    sceneDivider("Scene 4 of 8 \u00b7 Insurance Review");
+    addNarrator("At StarCare Health*, a utilization review team checks the request.");
+    addListCard("info", "What StarCare Health* Checks", [
+      "Eligibility \u2014 is Rahul actively covered under this plan right now?",
+      "Clinical documentation \u2014 does the chart support the diagnosis and treatment plan in enough detail?",
+      "ICD-10 diagnosis match \u2014 does the billing code on the request actually match Rheumatoid Arthritis?",
+      "Step therapy history \u2014 has Rahul tried a more standard, lower-cost medication first, as the plan's policy expects?"
+    ]);
+    addPriya("Each of these exists for a reason \u2014 mostly to make sure the right patient gets the right treatment, safely and at a sustainable cost.");
+
+    addChoices([
+      { label: "\ud83d\ude1f \u201cI haven't tried anything before Humira\u2026 is that a problem?\u201d", reaction: "worry_step_therapy" },
+      { label: "\u2753 \u201cWhat happens if something in my chart is missing?\u201d", reaction: "ask_missing" }
+    ], function(opt){
+      addRahul(opt.label.replace(/^\S+\s/, ""));
+      next();
+    });
+  }
+
+  function scene5(){
+    updateProgress();
+    sceneDivider("Scene 5 of 8 \u00b7 Denial");
+    addNarrator("Three business days later\u2026");
+    addCard("warn", "DENIED", "Reason: Missing step therapy documentation.");
+    addRahul("Denied?? Does that mean I can't get the medication at all?");
+    addPriya("Take a breath \u2014 a denial isn't the end of the road. It almost always means something is missing or needs clarification, not that the answer is final.");
+    addPriya("On our side, this kind of denial also costs the physician's office real time \u2014 usually 2 or more staff hours to sort out and resubmit.");
+    addPriya("The good news: there's a clear next step. We can appeal.");
+
+    addChoices([
+      { label: "\ud83d\ude29 \u201cThis is so frustrating. I just want to start feeling better.\u201d", reaction: "discouraged" },
+      { label: "\ud83d\udcaa \u201cOkay \u2014 tell me what we need to do to fix this.\u201d", reaction: "determined" }
+    ], function(opt){
+      addRahul(opt.label.replace(/^\S+\s/, ""));
+      next();
+    });
+  }
+
+  function scene6(){
+    updateProgress();
+    sceneDivider("Scene 6 of 8 \u00b7 Appeal");
+    addNarrator("Dr. Patel's office begins building the appeal.");
+    addPriya("We start by gathering documentation showing Rahul's symptoms, exam findings, and prior treatment attempts.");
+    addPriya("Dr. Patel also writes a Letter of Medical Necessity \u2014 a clinical explanation of exactly why Humira is the right treatment for Rahul, now.");
+    addPriya("Once everything is together, we file a formal appeal with StarCare Health*, directly referencing the original denial.");
+    addRahul("So we're not starting completely over?");
+    addPriya("Exactly \u2014 we're addressing the one missing piece, not resubmitting from scratch.");
+
+    addChoices([
+      { label: "\u23f1\ufe0f \u201cHow long will the appeal take this time?\u201d", reaction: "ask_appeal_time" },
+      { label: "\ud83e\udd1e \u201cDo appeals like this usually succeed?\u201d", reaction: "ask_appeal_success" }
+    ], function(opt){
+      addRahul(opt.label.replace(/^\S+\s/, ""));
+      next();
+    });
+  }
+
+  function scene7(){
+    updateProgress();
+    sceneDivider("Scene 7 of 8 \u00b7 Approval");
+    addNarrator("One week later\u2026");
+    addCard("success", "APPROVED", "Reference #SC-48217. This Prior Authorization is now saved on Rahul's file.");
+    addPriya("Great news, Rahul \u2014 your Prior Authorization for Humira has been approved.");
+    addPriya("This approval is saved on file going forward, so you won't need to repeat this Prior Authorization process for refills of this same medication.");
+    addRahul("That's such a relief. I can finally start treatment.");
+    addPriya("You can. And now you know what's actually happening behind the scenes the next time this comes up.");
+
+    addChoices([
+      { label: "\ud83d\udcdd \u201cWhat should I take away from all this?\u201d", reaction: "takeaway_patient_first" },
+      { label: "\ud83d\udcca \u201cHow do health systems track this kind of thing?\u201d", reaction: "takeaway_system_first" }
+    ], function(opt, idx){
+      addRahul(opt.label.replace(/^\S+\s/, ""));
+      next(idx === 1); // pass a flag to flip the order of the two takeaway panels
+    });
+  }
+
+  function scene8(systemFirst){
+    updateProgress();
+    sceneDivider("Scene 8 of 8 \u00b7 Takeaways");
+    addNarrator("Rahul's story is complete. Here's what each side of this process learned.");
+
+    var patientPanel = function(){
+      addListCard("patient", "\ud83d\udc66 Patient Perspective \u2014 What Rahul Learned", [
+        "A Prior Authorization is a checkpoint, not a rejection.",
+        "Denials are common \u2014 and usually fixable, not final.",
+        "Missing documentation (like step therapy history) drives most delays.",
+        "Once approved, it's saved on file \u2014 no need to repeat it for the same medication."
+      ]);
+    };
+    var systemPanel = function(){
+      addListCard("system", "\ud83d\udcca System Perspective \u2014 How Health Systems Track This", [
+        "Denial rate \u2014 the percentage of PA requests denied on first submission.",
+        "Appeal rate \u2014 the percentage of denials that get formally appealed.",
+        "Resolution time \u2014 how long it takes from initial request to a final approval or denial.",
+        "These metrics drive staffing decisions and process improvements across the system."
+      ]);
+    };
+
+    if(systemFirst){ systemPanel(); patientPanel(); }
+    else { patientPanel(); systemPanel(); }
+
+    addNarrator("Thanks for following Rahul's story. Remember: StarCare Health is an illustrative example used throughout this simulation, not a real insurance company.");
+    progressFill.style.width = "100%";
+    progressLabel.textContent = "Story Complete";
+    progressPct.textContent = "100%";
+
+    var wrap = el("div", "flex justify-center mt-2");
+    var btn = el("button", "bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold rounded-full px-5 py-2.5", "Restart Story");
+    btn.type = "button";
+    btn.addEventListener("click", restartStory);
+    wrap.appendChild(btn);
+    feed.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  var SCENES = [scene1, scene2, scene3, scene4, scene5, scene6, scene7, scene8];
+
+  function next(arg){
+    sceneIndex++;
+    if(sceneIndex >= SCENES.length){ return; }
+    setTimeout(function(){ SCENES[sceneIndex](arg); }, 250);
+  }
+
+  /* ---------------------------------------------------------------------
+     RESTART — clears the feed without ever using innerHTML, then replays
+     scene 1 from a clean state.
+     --------------------------------------------------------------------- */
+  function restartStory(){
+    while(feed.firstChild){
+      feed.removeChild(feed.firstChild);
+    }
+    sceneIndex = 0;
+    SCENES[0]();
+  }
+
+  document.getElementById("restartBtn").addEventListener("click", restartStory);
+  document.getElementById("restartBtnMobile").addEventListener("click", restartStory);
+
+  /* ---------------------------------------------------------------------
+     INIT
+     --------------------------------------------------------------------- */
+  SCENES[0]();
+
+})();
+</script>
+
+</body>
+</html>
